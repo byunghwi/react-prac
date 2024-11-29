@@ -1,13 +1,13 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminMain from '../components/Main';
 import Login from '../components/Login';
 
 function AppRoutes() {
-  console.log('로그인 상태 확인: ', sessionStorage.getItem('user'));
+  const location = useLocation();
+  console.log(`현재 URL: ${location.pathname}, 세션:${sessionStorage.getItem('user')}` );
   const isAuthenticated = !!sessionStorage.getItem('user'); // 로그인 상태 확인
 
   return (
-    <Router>
       <Routes>
         {/* 루트 경로 */}
         <Route 
@@ -52,7 +52,6 @@ function AppRoutes() {
           <Route path="" element={<AlertLimits />} />
         </Route> */}
       </Routes>
-    </Router>
   );
 }
 

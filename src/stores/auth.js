@@ -1,20 +1,20 @@
-import { Router, useNavigate } from 'react-router-dom';
+
 import { create } from 'zustand';
 import apiService from '../api/apiService';
 
-// sessionStorage에서 만료 시간 포함하여 데이터 가져오기
-const getSessionStorageWithExpiry = (key) => {
-  const itemStr = sessionStorage.getItem(key);
-  if (!itemStr) return null;
+// // sessionStorage에서 만료 시간 포함하여 데이터 가져오기
+// const getSessionStorageWithExpiry = (key) => {
+//   const itemStr = sessionStorage.getItem(key);
+//   if (!itemStr) return null;
 
-  const item = JSON.parse(itemStr);
-  const now = new Date();
-  if (now.getTime() > item.expiry) {
-    sessionStorage.removeItem(key);
-    return null;
-  }
-  return item.value;
-}
+//   const item = JSON.parse(itemStr);
+//   const now = new Date();
+//   if (now.getTime() > item.expiry) {
+//     sessionStorage.removeItem(key);
+//     return null;
+//   }
+//   return item.value;
+// }
 
 // sessionStorage에 데이터를 저장하는 함수 (timeToLive: 만료 시간, 초 단위)
 const setSessionStorageWithExpiry = (key, value, timeToLive) => {
@@ -49,34 +49,32 @@ const useAuthStore = create((set, get) => ({
   },
 
   logout: async() => {
-    const navigate = useNavigate();
-
     try {
-      await apiService.logout();
+      let result = await apiService.logout();
       set({ loginId: '', isLoggedIn: false});
       sessionStorage.removeItem('user');
       sessionStorage.removeItem('token');
       localStorage.clear();
-      navigate('/login');
+      return 'success';
     } catch (error) {
-      navigate('/login');
+      return 'fail';
     }
   },
 
-  getSessionData: () => {
-    const storedUser = getSessionStorageWithExpiry('user');
-    const navivate = useNavigate(); // React Router로 페이지 이동
+  // getSessionData: () => {
+  //   const storedUser = getSessionStorageWithExpiry('user');
+  //   const navivate = useNavigate(); // React Router로 페이지 이동
     
-    if (storedUser) {
-      set({ loginId: storedUser, isLoggedIn: true });
-    } else {
-      set({ loginId: '', isLoggedIn: false });
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('token');
-      localStorage.clear();
-      navivate('/login');
-    }
-  }
+  //   if (storedUser) {
+  //     set({ loginId: storedUser, isLoggedIn: true });
+  //   } else {
+  //     set({ loginId: '', isLoggedIn: false });
+  //     sessionStorage.removeItem('user');
+  //     sessionStorage.removeItem('token');
+  //     localStorage.clear();
+  //     navivate('/login');
+  //   }
+  // }
 }));
 
 

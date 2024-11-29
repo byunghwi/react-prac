@@ -5,7 +5,7 @@ import logo from '../assets/images/admin_logo_2@2x.png';
 
 export default function Login() {
   const [id, setId] = useState(""); // 로그인 ID를 위한 로컬 상태
-  const [pass, setPass] = useState(""); // 비밀번호를 위한 로컬 상태
+  const [pwd, setPwd] = useState(""); // 비밀번호를 위한 로컬 상태
   const [isErr, setIsErr] = useState(false); // 로그인 실패 시 에러 상태
   const login = useAuthStore((state) => state.login); // zustand 스토어의 로그인 함수 가져오기
   const navigate = useNavigate(); // 로그인 후 이동을 위한 네비게이션 훅
@@ -14,7 +14,7 @@ export default function Login() {
     e.preventDefault(); // 기본 폼 제출 동작 방지
 
     // zustand 스토어의 로그인 함수를 호출하여 로그인 시도
-    const result = await login({ loginId: id, loginPw: pass });
+    const result = await login({ loginId: id, loginPw: pwd });
 
     if (result === "fail") {
       setIsErr(true); // 로그인 실패 시 에러 메시지 표시
@@ -66,8 +66,8 @@ export default function Login() {
                     name="login_pw"
                     placeholder="Password"
                     autoComplete="off"
-                    value={pass}
-                    onChange={(e) => setPass(e.target.value)} // 비밀번호 입력 시 상태 업데이트
+                    value={pwd}
+                    onChange={(e) => setPwd(e.target.value)} // 비밀번호 입력 시 상태 업데이트
                     tabIndex="3"
                   />
                   <button
@@ -75,7 +75,7 @@ export default function Login() {
                     className="btnClr"
                     aria-label="입력내용 삭제"
                     tabIndex="4"
-                    onClick={() => setPass("")} // 비밀번호 입력 필드 비우기
+                    onClick={() => setPwd("")} // 비밀번호 입력 필드 비우기
                   ></button>
                 </div>
                 {isErr && (

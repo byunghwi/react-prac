@@ -19,7 +19,7 @@ const logout = async(data) => {
   const config = {
     headers: {
       'Content-Type': 'multipart/form-data',
-      'Autorizstion': 'Bearer ' + sessionStorage.getItem('token') 
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token') 
     }
   }
   try {
