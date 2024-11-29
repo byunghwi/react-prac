@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminMain from '../components/Main';
 import Login from '../components/Login';
+import UserList from '../pages/user/List'
 
 function AppRoutes() {
   const location = useLocation();
@@ -25,15 +26,15 @@ function AppRoutes() {
           } 
         />
 
-        {/* <Route path="/user" element={<AdminMain />}>
+        <Route path="/user" element={<AdminMain />}>
           <Route path="list" element={<UserList />} />
-          <Route path="register" element={<UserRegister />} />
+          {/* <Route path="register" element={<UserRegister />} />
           <Route path="history" element={<UserHistory />} />
           <Route path="auth" element={<UserAuth />} />
-          <Route path="detail/:id" element={<UserModify />} />
+          <Route path="detail/:id" element={<UserModify />} /> */}
         </Route>
 
-       
+        {/*
         <Route path="/vertiport" element={<AdminMain />}>
           <Route path="list" element={<VertiportList />} />
           <Route path="register" element={<VertiportRegister />} />

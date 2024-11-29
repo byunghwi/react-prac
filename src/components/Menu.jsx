@@ -1,11 +1,13 @@
 
+import { Link } from 'react-router-dom';
 import '../styles/menu.css';
 
 export default function Menu() {
+  
   return (
     <div className="left">
       <ul>
-        <li>관제 배정 관리</li>
+        <Link to="/user/list">관제 배정 관리</Link>
         <li>접속 이력</li>
         <li>권한 관리</li>
       </ul>

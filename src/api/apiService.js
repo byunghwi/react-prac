@@ -31,6 +31,20 @@ const logout = async(data) => {
   }
 }
 
+const loadUserList = (params) => {
+  return axios.get(`/api/mng/user`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    },
+    params: params
+  }).then((response) => {
+    return response.data;
+  }).catch((error) => {
+    console.log('[apiService] loadUserList 정보를 받아오는 중 에러가 발생했습니다.', error);
+  });
+}
+
 export default {
-  login, logout
+  login, logout, loadUserList
 }
