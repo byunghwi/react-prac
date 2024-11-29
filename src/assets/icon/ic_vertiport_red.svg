@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <g id="ic_vertiport_r" transform="translate(-914 -288)">
+    <g id="타원_231" data-name="타원 231" transform="translate(914 288)" fill="#464951" stroke="#9d9ea3" stroke-width="1">
+      <circle cx="15" cy="15" r="15" stroke="none"/>
+      <circle cx="15" cy="15" r="14.5" fill="none"/>
+    </g>
+    <path id="패스_43976" data-name="패스 43976" d="M514.74,400.439v2.7H511.8a3.606,3.606,0,0,0-2.744-2.74v-2.938h2.7v-1.548h-6.94v1.548h2.69V400.4a3.606,3.606,0,0,0-2.732,2.737h-2.94v-2.7h-1.548v6.941h1.548v-2.7h2.94a3.6,3.6,0,0,0,2.732,2.738v2.94h-2.69v1.548h6.94V410.36h-2.7v-2.937a3.607,3.607,0,0,0,2.744-2.741h2.939v2.7h1.548v-6.941Zm-6.452,5.523a2.053,2.053,0,1,1,2.053-2.053A2.054,2.054,0,0,1,508.288,405.961Z" transform="translate(420.712 -100.908)" fill="#ff263d"/>
+  </g>
+</svg>

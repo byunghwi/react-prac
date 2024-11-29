@@ -1,0 +1,6 @@
+.right{
+  width: calc(100vw - 150px);
+  height: calc(100vh - 40px);
+  /* background-color: green; */
+  display: table-cell;
+}

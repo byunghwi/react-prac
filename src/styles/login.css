@@ -1,0 +1,83 @@
+#root{
+	position: relative;
+}
+#container{
+	.wrapper{
+		&.bgGrey{
+			position: relative;
+			width: 100vw;
+			height: 100vh;
+			background-color: #1b1c1f;
+		}
+		.loginWrap{
+			position: absolute;
+			top: calc(50% - 289px);
+			left: calc(50% - 340px);
+			width: 680px;
+			border-radius: 15px;
+			border: 1px solid #D0D5DD17;
+			background-color: #282b32;
+			h1{
+				text-align: center;
+				a{
+					margin: 41px 0 0;
+					display: block;
+					img{
+						width:266px;
+						height: 64px;
+					}
+				}
+			}
+			.inputWrap{display:grid; gap: 12px; width: 100%;  padding:41px 40px 60px; 
+				
+				form {display: grid; gap: 10px;
+					div{
+						display: flex;
+						position: relative;
+						input[type=text].loginId,input[type=password].loginPw{
+						font-size: 18px; 
+						text-indent: 30px; border:none; 
+						border-radius:5px; height: 70px ;padding: 0; font-weight: 500; background-color: #464951; color: #D9D9D9;
+						&:focus{outline: 1px solid #5D93FF}
+						&::placeholder{color:#D9D9D9;}
+						&:-webkit-autofill{font-size: 18px;} 
+						}
+						button[type=button].btnClr{
+							display: none;
+							position: absolute;
+							top: 23px;
+							right: 30px;
+							width: 24px;
+							height: 24px;
+							background: url("../../../images/ic_x_2.svg") center center no-repeat;
+							cursor: pointer;
+							&.active{
+								display: block;
+							}
+						}
+					} 
+				}
+				p.warning{
+					color: #FF263D;
+					text-align: center;
+					font-size: 18px;
+					font-weight: 500;
+				}
+				.btnWrap{
+					display: flex;
+					justify-content: center;
+					button[type=submit].loginBtn{
+						text-align: center;
+						font-size: 24px; 
+						color: #121316;
+						background-color:  #D9D9D9; ;
+						width: 256px;
+						height: 70px;
+						border-radius: 35px;
+						&:active,&:hover{background-color: #9d9ea3;}
+					}
+				}
+			}
+		}
+	}
+}

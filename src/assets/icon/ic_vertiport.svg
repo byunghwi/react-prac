@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <g id="ic_vertiport_2" transform="translate(-923 -302)">
+    <g id="타원_231" data-name="타원 231" transform="translate(923 302)" fill="#464951" stroke="#9d9ea3" stroke-width="1">
+      <circle cx="11" cy="11" r="11" stroke="none"/>
+      <circle cx="11" cy="11" r="10.5" fill="none"/>
+    </g>
+    <path id="ic_v" d="M2.459-11.312H.328l2.745,8H5.595l2.734-8H6.208l-1.841,5.9H4.3Z" transform="translate(929.672 320.313)" fill="#fff"/>
+  </g>
+</svg>
