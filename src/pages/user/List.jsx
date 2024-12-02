@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import useUserStore from '../../stores/user'; 
-import '../../styles/userList.css';
 
 export default function List() {
   const [searchType, setSearchType] = useState('');
@@ -20,7 +19,7 @@ export default function List() {
       }
     }
     fetchData();
-  }, [searchType, searchValue]); // 빈 배열로 한 번만 호출되도록 설정
+  }, [searchType, searchValue]);
 
   const handleSearchClick = () => {
     getUserList(searchType, searchValue).then((userList) => {

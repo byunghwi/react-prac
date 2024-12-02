@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminMain from '../components/Main';
 import Login from '../components/Login';
 import UserList from '../pages/user/List'
+import Auth from '../pages/auth/Auth'
 
 function AppRoutes() {
   const location = useLocation();
@@ -25,13 +26,17 @@ function AppRoutes() {
             isAuthenticated ? <Navigate to="/" replace /> : <Login />
           } 
         />
-
+          
         <Route path="/user" element={<AdminMain />}>
           <Route path="list" element={<UserList />} />
           {/* <Route path="register" element={<UserRegister />} />
           <Route path="history" element={<UserHistory />} />
           <Route path="auth" element={<UserAuth />} />
           <Route path="detail/:id" element={<UserModify />} /> */}
+        </Route>
+
+        <Route path="/auth"  element={<AdminMain />} >
+          <Route path="auth" element={<Auth />} />
         </Route>
 
         {/*

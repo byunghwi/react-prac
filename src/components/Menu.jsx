@@ -7,9 +7,9 @@ export default function Menu() {
   return (
     <div className="left">
       <ul>
-        <Link to="/user/list">관제 배정 관리</Link>
+        <li><Link to="/user/list">관제 배정 관리</Link></li>
         <li>접속 이력</li>
-        <li>권한 관리</li>
+        <li><Link to="/auth/auth">권한 관리</Link></li>
       </ul>
       <ul>
         <li>버티포트 관리</li>

@@ -18,6 +18,33 @@ const useUserStore = create((set, get) => ({
     } catch (error) {
       console.log(error);
     }
+  },
+
+  getRoleList: async() => {
+    try {
+      let response = await apiService.loadRoleList();
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  getAuthList: async() => {
+    try {
+      let response = await apiService.loadAuthList();
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  modifyRole: async(role) => {
+    try {
+      let response = await apiService.modifyRole(role);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }));
 
