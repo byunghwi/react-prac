@@ -45,6 +45,24 @@ const useUserStore = create((set, get) => ({
     } catch (error) {
       console.log(error);
     }
+  },
+
+  saveRole: async(role) => {
+    try {
+      let response = await apiService.saveRole(role);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  deleteRole: async(id) => {
+    try {
+      let response = await apiService.deleteRole(id);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }));
 

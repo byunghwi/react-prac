@@ -85,6 +85,34 @@ const modifyRole = async(data) => {
   });
 }
 
+const saveRole = async(data) => {
+  const config =  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/role/insert`, data, config).then((response) => {
+    return response.data;
+  }).catch((error) => {
+    return error;
+  });
+}
+
+const deleteRole = async(data) => {
+  const config =  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    }
+  }
+  return axios.delete(`/api/mng/role/delete/${data}`, config).then((response) => {
+    return response.data;
+  }).catch((error) => {
+    return error;
+  });
+}
+
 export default {
-  login, logout, loadUserList, loadRoleList, loadAuthList, modifyRole
+  login, logout, loadUserList, loadRoleList, loadAuthList, modifyRole, saveRole, deleteRole
 }

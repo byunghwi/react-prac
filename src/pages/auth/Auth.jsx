@@ -9,19 +9,15 @@ export default function Auth() {
   const [isShowAuth, setIsShowAuth] = useState(false);
 
   const storeUser = useUserStore();
-  const { getAuthList, getRoleList, modifyRole } = storeUser;
+  const { getAuthList, getRoleList, modifyRole, saveRole, deleteRole } = storeUser;
 
   const handleAuthChange = (key) => {
-    setSelectedAuth((prev)=> {
-      if(prev.includes(key)) {
-        //체크해제
-        return prev.filter((item)=> item !== key);
-      } else {
-        //체크
-        return [...prev, key];
-      }
-    })
-  }
+    setSelectedAuth((prev) =>
+      prev.includes(key)
+        ? prev.filter((item) => item !== key) // 체크 해제
+        : [...prev, key] // 체크
+    );
+  };
 
   const handleRoleNameChange = (newRoleName, targetRole) => {
     setRoleList((prev) =>
@@ -34,38 +30,67 @@ export default function Auth() {
     )
   }
   
-  const addRole = () => {};
+  const addRole = () => {
+    setRoleList((prevRoleList) => [
+      ...prevRoleList.map((role) => ({ ...role, isSelect: false })),
+      { roleGroupId: 0, roleName: '', isSelect: true },
+    ]);
+
+    setIsShowAuth(true);
+    setSelectedAuth([]);
+  };
+
+  
+  const cancel = () => {
+    setRoleList((prevRoleList) => {
+      // 새로 추가된 행을 제외하고 나머지 행을 업데이트
+      return prevRoleList
+        .filter((ind) => !(ind.roleGroupId === 0 && ind.roleName === '' && ind.isSelect))
+        .map((ind) => ({ ...ind, isSelect: false })); // 모든 항목의 isSelect를 false로 설정
+    });
+  };
 
   const modify = async(role) => {
-    role.authorityKey = JSON.stringify(selectedAuth);
-    delete role.isSelect;
-    
-    console.log('modify> selectedAuth: ', selectedAuth);
-    console.log('modify> role: ', role);
-
-    let modifyResult = await modifyRole(role);
-    console.log('modifyResult: ', modifyResult);
-
+    const updatedRole = { ...role, authorityKey: JSON.stringify(selectedAuth) };
+    delete updatedRole.isSelect;  //api 통신 data에 isSelect없으므로 제거
+  
+    const modifyResult = await modifyRole(updatedRole);
+    if (modifyResult === 'success') initAuth();
   };
 
   const viewRole = (role) => {
-    console.log('viewRole...', role, roleList);
-    roleList.map((item)=>{
-      item.isSelect = false;
-    })
-    role.isSelect = true;
+    setRoleList((prevRoleList) =>
+      prevRoleList.map((item) => ({
+        ...item,
+        isSelect: item === role, // 선택된 역할만 true로 설정
+      }))
+    );
     setIsShowAuth(true);
-
     setSelectedAuth(role?.authorityKey ? JSON.parse(role.authorityKey) : []);
   };
 
-  const remove = () => {};
+  const remove = async(role) => {
+    const res = await deleteRole(role.roleGroupId);
+    if (res === 'success') initAuth();
+  };
 
-  const save = () => {};
+  const save = async(role) => {
+    const updatedRole = { ...role, authorityKey: JSON.stringify(selectedAuth) };
+    delete updatedRole.isSelect; //api 통신 data에 isSelect없으므로 제거
+
+    const res = await saveRole(updatedRole);
+    if (res === 'success') initAuth();
+  };
 
   const initAuth = async () => {
     let roleResult = await getRoleList();
-    if (roleResult) setRoleList(roleResult);
+    if (roleResult) {
+      const updatedRoleList = roleResult.map((role) => ({
+        ...role,
+        isSelect: false, // 모든 객체에 isSelect: false 추가
+      }));
+      setRoleList(updatedRoleList);
+    }
     
     let authResult = await getAuthList();
     if(authResult) setAuthList(authResult);
@@ -93,7 +118,7 @@ export default function Auth() {
                     type="radio"
                     checked={item.isSelect}
                     name="role"
-                    onClick={()=>viewRole(item)}
+                    onChange={()=>viewRole(item)}
                   />
                   <input
                     type="text"
@@ -111,7 +136,10 @@ export default function Auth() {
                   </div>
                   <div className="a-sc-btn">
                     {!item.roleGroupId && item.isSelect ? (
-                      <button onClick={()=>save(item)}>저장</button>
+                      <>
+                        <button onClick={()=>save(item)}>저장</button>
+                        <button onClick={()=>cancel(item)}>취소</button>
+                      </>
                     ) : null}
                   </div>
                 </li>
