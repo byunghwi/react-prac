@@ -113,6 +113,34 @@ const deleteRole = async(data) => {
   });
 }
 
+const loadLimitList = () => {
+  return axios.get(`/api/mng/warning`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    },
+  }).then((response) => {
+    return response.data;
+  }).catch((error) => {
+    console.log('[apiService] loadLimitList 정보를 받아오는 중 에러가 발생했습니다.', error);
+  });
+}
+
+const modifyLimit = async(data) => {
+  const config =  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/warning/update`, data, config).then((response) => {
+    return response;
+  }).catch((error) => {
+    return error;
+  });
+}
+
+
 export default {
-  login, logout, loadUserList, loadRoleList, loadAuthList, modifyRole, saveRole, deleteRole
+  login, logout, loadUserList, loadRoleList, loadAuthList, modifyRole, saveRole, deleteRole, loadLimitList, modifyLimit
 }

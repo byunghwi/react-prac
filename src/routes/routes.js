@@ -3,6 +3,7 @@ import AdminMain from '../components/Main';
 import Login from '../components/Login';
 import UserList from '../pages/user/List'
 import Auth from '../pages/auth/Auth'
+import AlertLimits from '../pages/AlertLimits'
 
 function AppRoutes() {
   const location = useLocation();
@@ -53,10 +54,12 @@ function AppRoutes() {
           <Route path="detail/:id" element={<CorridorModify />} />
         </Route>
 
-        
+         */}
+
         <Route path="/alertLimits" element={<AdminMain />}>
           <Route path="" element={<AlertLimits />} />
-        </Route> */}
+        </Route>
+        
       </Routes>
   );
 }

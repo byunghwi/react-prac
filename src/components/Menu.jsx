@@ -14,7 +14,7 @@ export default function Menu() {
       <ul>
         <li>버티포트 관리</li>
         <li>회랑 관리</li>
-        <li>경보 임계치 설정</li>
+        <li><Link to="/alertLimits">경보 임계치 설정</Link></li>
       </ul>
       <ul>
         <li>비행 기록 리뷰</li>
