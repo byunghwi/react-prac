@@ -26,12 +26,11 @@ export default function AlertLimits() {
         setGeoList(result.filter((ind) => ind.limitType == "G"));
         setCollisionList(result.filter((ind) => ind.limitType == "T"));
         setCurrentTime(
-          result.reduce((latest, item) => {
-            return new Date(item.updateAt) > new Date(latest)
-              ? item.updateAt
+          result.reduce((latest, currentitem) => {
+            return new Date(currentitem.updateAt) > new Date(latest.updateAt)
+              ? currentitem
               : latest;
-          }),
-          result[0].updateAt
+          }).updateAt
         );
       }  
     } catch (error) {
@@ -39,16 +38,20 @@ export default function AlertLimits() {
     }
   };
 
-  const handleDistance = (type, index, value) => {
-    const updateList = type === "geo" ? [...geoList] : [...collisionList];
-    updateList[index] = { ...updateList[index], distance: Number(value) };
-    type === "geo" ? setGeoList(updateList) : setCollisionList(updateList);
+  const handleDistance = (type, index, e) => {
+    const inputValue = e.target.value;
+    // 숫자와 소수점만 허용하는 정규식
+    if (/^\d*\.?\d*$/.test(inputValue)) {
+      const updateList = type === "geo" ? [...geoList] : [...collisionList];
+      updateList[index] = { ...updateList[index], distance: inputValue };
+      type === "geo" ? setGeoList(updateList) : setCollisionList(updateList);
+    }
   };
 
   const handleModify = async() => {
     try {
       let res = await modifyLimit([...geoList, ...collisionList]);
-      if(res.response.status == 200) {
+      if(res.status == 200) {
         alert("저장이 완료되었습니다.");
       } else {
         console.log('저장실패 : ', res);
@@ -84,7 +87,8 @@ export default function AlertLimits() {
                       <input
                         type="text"
                         value={item.distance}
-                        onChange={(e) => handleDistance('collision', index, e.target.value)}
+                        onChange={(e) => handleDistance('collision', index, e)}
+                        placeholder="숫자와 소수점만 입력하세요"
                       />{" "}
                       NM 이하 근접
                     </td>
@@ -109,7 +113,10 @@ export default function AlertLimits() {
                   <tr key={index}>
                     <td>{item.limitLevel}</td>
                     <td>
-                      <input type="text" value={item.distance} onChange={(e) => handleDistance('geo', index, e.target.value)} /> NM 이하 근접접
+                      <input type="text" 
+                        value={item.distance} 
+                        onChange={(e) => handleDistance('geo', index, e)}
+                        placeholder="숫자와 소수점만 입력하세요"/> NM 이하 근접접
                     </td>
                   </tr>
                 );
