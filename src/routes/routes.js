@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AdminMain from '../components/Main';
 import Login from '../components/Login';
 import UserList from '../pages/user/List'
+//import UserRegister from '../pages/user/Register'
 import Auth from '../pages/auth/Auth'
 import AlertLimits from '../pages/AlertLimits'
 
@@ -30,7 +31,8 @@ function AppRoutes() {
           
         <Route path="/user" element={<AdminMain />}>
           <Route path="list" element={<UserList />} />
-          {/* <Route path="register" element={<UserRegister />} />
+          {/* 
+          <Route path="register" element={<UserRegister />} />
           <Route path="history" element={<UserHistory />} />
           <Route path="auth" element={<UserAuth />} />
           <Route path="detail/:id" element={<UserModify />} /> */}

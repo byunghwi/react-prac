@@ -4,6 +4,16 @@ import apiService from '../api/apiService';
 const useUserStore = create((set, get) => ({
   cntTotalList: 0,
   pageNo: 1,
+  roleList: [],
+  authList: [],
+  
+  setRoleList: async(newVale) => {
+    set({ roleList: newVale })
+  },
+
+  setAuthList: async(newVal) => {
+    set({ authList: newVal })
+  },
 
   getUserList: async(searchType, searchValue) => {
     try {
@@ -23,7 +33,7 @@ const useUserStore = create((set, get) => ({
   getRoleList: async() => {
     try {
       let response = await apiService.loadRoleList();
-      return response;
+      set({ roleList: response })
     } catch (error) {
       console.log(error);
     }
@@ -32,7 +42,7 @@ const useUserStore = create((set, get) => ({
   getAuthList: async() => {
     try {
       let response = await apiService.loadAuthList();
-      return response;
+      set({authList: response})
     } catch (error) {
       console.log(error);
     }
