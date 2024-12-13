@@ -5,15 +5,10 @@ import "../../styles/auth.css";
 export default function Auth() {
   const [selectedAuth, setSelectedAuth] = useState([]);
   const [isShowAuth, setIsShowAuth] = useState(false);
-
-  const roleList = useUserStore((state) => state.roleList);
-  const authList = useUserStore((state) => state.authList);
-  const getAuthList = useUserStore((state) => state.getAuthList);
-  const getRoleList = useUserStore((state) => state.getRoleList);
-  const modifyRole = useUserStore((state) => state.modifyRole);
-  const saveRole = useUserStore((state) => state.saveRole);
-  const deleteRole = useUserStore((state) => state.deleteRole);
-  const setRoleList = useUserStore((state) => state.setRoleList);
+  const {
+    roleList, authList,
+    actions: { getAuthList, getRoleList, modifyRole, saveRole, deleteRole, setRoleList }
+  } = useUserStore();
 
   const viewRole = (role) => {
     const updatedRoleList = roleList.map((item) => ({

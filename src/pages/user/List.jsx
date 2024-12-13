@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import useUserStore from '../../stores/user'; 
+import { useNavigate } from 'react-router-dom';
 
 export default function List() {
+  const navigate = useNavigate();
   const [searchType, setSearchType] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [userList, setUserList] = useState([]);
 
-  const storeUser = useUserStore();
-  const { getUserList } = storeUser;
+  const {
+    actions: { getUserList }
+  } = useUserStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -28,6 +31,10 @@ export default function List() {
       console.error('Error during search:', error);
     });
   }
+
+  const handleRegisterClick = () => {
+    navigate("/user/register")
+  } 
   
   return (
     <div className="wrap-list">
@@ -72,7 +79,7 @@ export default function List() {
           {/* <Pagination totalItems={cntTotalList} currentPage={pageNo} onPageChange={setPageNo} /> */}
         </div>
         <div className="wrap-reg">
-          <button /*onClick={handleRegisterClick}*/>등록</button>
+          <button onClick={handleRegisterClick}>등록</button>
         </div>
       </div>
     </div>
