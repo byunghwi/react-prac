@@ -19,7 +19,12 @@ export default function Register() {
       }
     }
     fetchData();
-  }, [])
+  }, []);
+
+  const handleRoleChange = (target) => {
+    setSelectRole(target);
+    setSelectedAuth(JSON.parse(roleList.find(ind=>ind.roleName==target).authorityKey))
+  }
 
   return (
     <div className="wrap-list">
@@ -33,19 +38,18 @@ export default function Register() {
           <tr>
             <td>ROLE/AUTH</td>
             <td>
-              <select value={selectedRole} onChange={(e) => setSelectRole(e.target.value)}>
+              <select value={selectedRole} onChange={(e) => handleRoleChange(e.target.value)}>
                 <option value="">== Select ==</option>
                 {roleList.map((item, index) => (
                   <option key={index} >{item.roleName}</option>
                 ))}
               </select>
               <ul>
-                {authList.map((item, index) => {
-                  <li key={index}>
+                {authList.map((item, index) => (<li key={index}>
                     <input type="checkbox" value={item.authorityKey} checked={selectedAuth.includes(item.authorityKey)} disabled />
                     {item.authority}
                   </li>
-                })}
+                ))}
               </ul>
             </td>
           </tr>
