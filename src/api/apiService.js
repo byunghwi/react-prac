@@ -140,7 +140,40 @@ const modifyLimit = async(data) => {
   });
 }
 
+const loadVertiportList = (params) => {
+  return axios.get(`/api/mng/vertiport`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    },
+    params: params
+  }).then((response) => {
+    console.log("[apiService] loadVertiportList response: ", response);
+    return response.data;
+  }).catch((error) => {
+    console.log('[apiService] loadVertiportList 정보를 받아오는 중 에러가 발생했습니다.', error);
+  });
+}
+
+const loadCorridorList = (params) => {
+  return axios.get(`/api/mng/corridor`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    },
+    params: params
+  }).then((response) => {
+    console.log("[apiService] loadCorridorList response: ", response);
+    return response.data;
+  }).catch((error) => {
+    console.log('[apiService] loadCorridorList 정보를 받아오는 중 에러가 발생했습니다.', error);
+  });
+}
 
 export default {
-  login, logout, loadUserList, loadRoleList, loadAuthList, modifyRole, saveRole, deleteRole, loadLimitList, modifyLimit
+  login, logout, 
+  loadUserList, loadRoleList, loadAuthList, 
+  modifyRole, saveRole, deleteRole, 
+  loadLimitList, modifyLimit,
+  loadCorridorList, loadVertiportList
 }
