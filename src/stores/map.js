@@ -19,9 +19,11 @@ import 'ol-ext/dist/ol-ext.css';
 import { Fill, Icon, Stroke, Style, Text, Circle as CircleStyle } from 'ol/style.js'
 import WebGLVectorLayerRenderer from 'ol/renderer/webgl/VectorLayer.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
-import IC_WP from '../assets/icon/waypoint.svg'
-import IC_VP from '../assets/icon/ic_vertiport_grey.svg'
-import IC_VP_RED from '../assets/icon/ic_vertiport_red.svg'
+import IC_WP from '../assets/icon/waypoint.svg';
+import IC_VP from '../assets/icon/ic_vertiport_grey.svg';
+import IC_VP_RED from '../assets/icon/ic_vertiport_red.svg';
+import * as turf from '@turf/turf';
+import UtilFunc from "../utils/functions";
 
 proj4.defs('EPSG:5179', '+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
 register(proj4);
@@ -94,8 +96,235 @@ const useMapStore = create((set, get) => {
     ],
 
     actions: {
-      drawCorridors: () => {
-        // 구현 필요
+      drawCorridors: (corridors, group, isCenter) => {
+        const { olMap, lines, myCorridor, hideStyle, actions: {getLayer, addLayer, transformCoords, addFeaturePoint, showVertiport}} = get();
+        const corridorStoreState = useCorridorStore.getState(); // zustand의 상태 가져오기
+        let features = [];
+        let dashs = [];
+        let corridorLayer = getLayer('corridorLayer');
+        let corridorSource = corridorLayer?.getSource();
+        let corridorDashLayer = getLayer('corridorDashLayer');
+        let corridorDashSource = corridorDashLayer?.getSource();
+        let baseColor = "70, 73, 81"; // 관리하지 않는 회랑 // UtilFunc.getRandomColor();
+        let centerStyle = function (feature) {
+          const styles = [
+            new Style({
+              stroke: new Stroke({
+                color: `rgba(255,255,255, 1)`,
+                width: 3,
+                lineDash: [5,10],
+                lineDashOffset: 0
+              }),
+            }),
+          ];
+          return styles;
+        };
+        let showArr = ['center', 'waypoint', 'name'];
+        if(!corridorLayer){
+          const defaultStyle = {
+            'fill-color': ['get', 'fillColor'],
+            'stroke-color': ['get', 'strokeColor'],
+            'stroke-width': ['get', 'strokeWidth'],
+            'point-size' :  ['get', 'pointSize'],
+          };
+          class WebGLLayer extends VectorLayer {
+            constructor(options) {
+              super(options);
+              this.currentStyle = options.style || defaultStyle;
+            }
+            createRenderer() {
+              return new WebGLVectorLayerRenderer(this, {
+                style: this.currentStyle,
+              });
+            }
+            setStyle(newStyle) {
+              if(newStyle){
+                this.currentStyle = newStyle;
+                this.changed();
+              }
+            }
+          }
+          corridorSource = new VectorSource({
+            features: features
+          });
+          corridorLayer = new WebGLLayer({
+            source: corridorSource,
+            zIndex: 3,
+          })
+          addLayer('corridorLayer', corridorLayer);
+        }
+        if(!corridorDashLayer){
+          corridorDashSource = new VectorSource({
+            features: dashs
+          });
+          corridorDashLayer = new VectorLayer({
+            source: corridorDashSource,
+            zIndex: 3,
+          });
+          addLayer('corridorDashLayer', corridorDashLayer);
+        }
+        corridors.forEach(async(corridor) => {
+          let arrCorridor = corridor.corridorDetail;
+          let arrPolygon = corridor.corridorPolygon;
+
+          // [1] Polygon(폭)
+          if(corridorSource.getFeatureById('cdPolygon_'+corridor.corridorCode)){
+            let feature = corridorSource.getFeatureById('cdPolygon_'+corridor.corridorCode);
+            if(showArr.includes('width')){ // show 폭
+              feature.set('fillColor', `rgba(0,0,0,0)`)
+              feature.set('strokeColor', `rgba(115, 118, 127, 1)`)
+              feature.set('strokeWidth',1)
+            }else{ // hide
+              feature.set('fillColor','rgba(0, 0, 0, 0)')
+              feature.set('strokeColor','rgba(0, 0, 0, 0)')
+              feature.set('strokeWidth',0)
+            }
+          }else{
+            arrPolygon?.map(ind=>{
+              let jsonfeatures = new GeoJSON().readFeatures(ind.stBuffer.value, {
+                dataProjection: 'EPSG:4326',
+                featureProjection: 'EPSG:5179'
+              });
+              jsonfeatures.forEach(feature => {
+                if(showArr.includes('width')){ // show 폭
+                  feature.set('fillColor', `rgba(0,0,0,0)`)
+                  feature.set('strokeColor', `rgba(115, 118, 127, 1)`)
+                  feature.set('strokeWidth',1)
+                }else{ // hide
+                  feature.set('fillColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeWidth',0)
+                }
+                feature.setId('cdPolygon_'+corridor.corridorCode)
+                lines.corridor[corridor.corridorCode] = feature;
+                features.push(feature);
+              });
+            })
+          }
+          // [2] Sid, Star
+          corridor.corridorSidStar?.map(ind=>{
+            let jsonfeatures = new GeoJSON().readFeatures(ind.stBuffer.value, {
+              dataProjection: 'EPSG:4326',
+              featureProjection: 'EPSG:5179'
+            });
+            jsonfeatures.forEach(feature => {
+              if(ind.sidStar=="sid"){
+                if(showArr.includes('width')){ // show 폭
+                  feature.set('fillColor', 'rgba(38, 201, 126, 0.3)')
+                  feature.set('strokeColor', `rgba(38, 201, 126, 1)`)
+                  feature.set('strokeWidth', 1)
+                }else{ // hide
+                  feature.set('fillColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeWidth',0)
+                }
+              }else{
+                if(showArr.includes('width')){ // show 폭
+                  feature.set('fillColor', 'rgba(235, 78, 2, 0.3)')
+                  feature.set('strokeColor', `rgba(235, 78, 2, 1)`)
+                  feature.set('strokeWidth', 1)
+                }else{ // hide
+                  feature.set('fillColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeColor','rgba(0, 0, 0, 0)')
+                  feature.set('strokeWidth',0)
+                }
+              }
+              lines[ind.sidStar][corridor.corridorCode] = feature;
+              features.push(feature);
+            });
+          })
+          // [3] my corridor
+          arrCorridor.map((item,i)=>{ // 그리려는 회랑과 내가 관리하는 회랑이 일치하면 lines.mine에 저장
+            if(i<arrCorridor.length-1){
+              let comp1 = item.waypointCode + arrCorridor[i+1].waypointCode;
+              myCorridor.userPolygon?.map(ind=>{
+                let linkId = ind.linkId;
+                if(!lines.mine[linkId]){
+                  if(comp1==linkId){
+                    let jsonfeatures = new GeoJSON().readFeatures(ind.stBuffer.value, {
+                      dataProjection: 'EPSG:4326',
+                      featureProjection: 'EPSG:5179'
+                    });
+                    jsonfeatures.forEach(feature => {
+                      lines.mine[linkId] = feature;
+                    });
+                  }
+                }
+              })
+            }
+          });
+          let mypolygons = [];
+          Object.keys(lines.mine).forEach(ind=>{
+            let f = corridor.corridorLinkPolygon?.find(jnd=>jnd.linkId==ind)
+            if(f){
+              let coords = transformCoords(lines.mine[ind].getGeometry().getCoordinates(), 'EPSG:5179', 'EPSG:4326');
+              mypolygons.push(turf.polygon(coords));
+              // let transformedPolygonCoords = transformCoords(coords, 'EPSG:4326', 'EPSG:5179');
+              // let intersectPolygon = new Polygon(transformedPolygonCoords);
+              // let intersectFeature = new Feature(intersectPolygon);
+              // intersectFeature.set('fillColor', `rgba(93, 147, 255, 0.3)`)
+              // intersectFeature.set('strokeColor', `rgba(93, 147, 255, 1)`)
+              // intersectFeature.set('strokeWidth', 1)
+              // features.push(intersectFeature)
+            }
+          })
+
+          // [4] Center Line
+          for(var i=0; i<arrCorridor.length-1; i++){
+            if(corridorDashSource.getFeatureById('corridor_Center_' + corridor.corridorCode + "_" + i)){
+              let segmentLine = corridorDashSource.getFeatureById('corridor_Center_' + corridor.corridorCode + "_" + i);
+              if(showArr.includes('center')){ // show 중심선
+                segmentLine.setStyle(centerStyle)
+              }else{ // hide
+                segmentLine.setStyle(hideStyle);
+              }
+            }else{
+              let prev = transform([arrCorridor[i].waypointLon, arrCorridor[i].waypointLat], 'EPSG:4326', 'EPSG:5179')
+              let next = transform([arrCorridor[i+1].waypointLon, arrCorridor[i+1].waypointLat], 'EPSG:4326', 'EPSG:5179')
+              let segmentLine = new Feature({geometry: new LineString([prev,next]), type:"Ani"});
+              if(showArr.includes('center')){ // show 중심선
+                segmentLine.setStyle(centerStyle)
+                segmentLine.set('st', centerStyle)
+                if(group){
+                  segmentLine.set('group', group)
+                  segmentLine.set('corridor', corridor.corridorCode)
+                  segmentLine.set('index', arrCorridor[i].waypointIndex)
+                  segmentLine.set('prev', arrCorridor[i].waypointCode)
+                  segmentLine.set('next', arrCorridor[i+1].waypointCode)
+                }
+              }else{ // hide
+                segmentLine.setStyle(hideStyle);
+                segmentLine.set('st', hideStyle)
+              }
+              segmentLine.setId('corridor_Center_' + corridor.corridorCode + "_" + i)
+              lines.corridorCenter[corridor.corridorCode + '_' + i] = segmentLine;
+              dashs.push(segmentLine)
+            }
+          }
+          // [5] waypoints
+          let waypoints = arrCorridor.filter(item=>item.pointType=='waypoint').map((item,i)=>{
+            return {
+              styleType: "Waypoint", id:item.waypointCode, name: item.waypointCode,
+              lon: item.waypointLon, lat: item.waypointLat}
+          });
+          addFeaturePoint(waypoints)
+          // [6] vertiports
+          let vertiports = arrCorridor.filter(item=>item.pointType=='vertiport').map((item,i)=>{
+            return {id:item.waypointCode, lon:item.waypointLon, lat:item.waypointLat}
+          })
+          showVertiport(vertiports)
+        })
+        if(features.length>0) {
+          corridorSource.addFeatures(features); // 새로운 데이터 추가
+        }
+        if(dashs.length>0) {
+          corridorDashSource.addFeatures(dashs); // 새로운 데이터 추가
+        }
+        if(isCenter && corridorDashSource){
+          olMap.getView().fit(corridorDashSource.getExtent(),{
+            padding: [50, 50, 50, 50] // [top, right, bottom, left]
+          });
+        }
       },
       initMap: async (map) => {
         const { olMap, vectorLayer, layerGroup, actions: {addLayer, mapEvent, transformCoords} } = get();
@@ -289,6 +518,272 @@ const useMapStore = create((set, get) => {
         const { layerGroup } = get();
         return layerGroup[name];
       },
+      addFeaturePoint: (list) => {
+        const corridorStoreState = useCorridorStore.getState(); // zustand의 상태 가져오기
+        const { actions: {getLayer,addLayer,layerStyleFunc} } = get();
+        let features = [];
+        let waypointLayer = getLayer('waypointLayer');
+        let waypointSource = waypointLayer?.getSource();
+        if(!waypointLayer) {
+          waypointSource = new VectorSource({
+            features: features,
+          });
+          // waypointLayer = new WebGLPointsLayer({
+          //   source: waypointSource,
+          //   zIndex: 3,
+          //   style: {
+          //     "icon-src" : IC_WP,
+          //     "icon-height": 32,
+          //     "icon-width" : 32,
+          //     "icon-size" : [32,32],
+          //     "icon-scale" : UtilFunc.calculateScale(olMap.value.getView().getZoom()),
+          //   }
+          // });
+          waypointLayer = new VectorLayer({
+            source: waypointSource,
+            zIndex: 3,
+            style: (feature) => layerStyleFunc('waypointLayer', feature)
+          });
+          addLayer('waypointLayer', waypointLayer);
+          // const textLayer = new VectorLayer({
+          //   source: waypointSource,  // 동일한 피처에 텍스트 적용
+          //   zIndex: 3,
+          //   style: (feature) => layerStyleFunc('waypointLayer', feature)
+          // });
+          // addLayer('textLayer', textLayer);
+        }
+        let showArr = ['center', 'waypoint', 'name'];
+        list.map(ind=>{
+          let feature = waypointSource?.getFeatureById(ind.id);
+          let newPoint = new Point(transform([ind.lon, ind.lat], 'EPSG:4326', 'EPSG:5179'));
+          if(!feature){
+            if(showArr.includes('waypoint')){
+              let options = { geometry: newPoint, type: ind.styleType};
+              if(showArr.includes('name')){
+                if(ind.id) options.id = ind.id;
+                if(ind.name) options.nm = ind.name;
+              }
+              feature = new Feature(options)
+              if(ind.id) feature.setId(ind.id)
+              features.push(feature);
+            }
+          }else{
+            if(showArr.includes('waypoint')){
+              if(showArr.includes('name')){
+                if(ind.id) feature.set('id', ind.id)
+                if(ind.name) feature.set('nm', ind.name)
+              }else{
+                feature.set('id', null)
+                feature.set('nm', null)
+              }
+              feature.setGeometry(newPoint);
+            }else{
+              waypointSource.removeFeature(feature)
+            }
+          }
+        })
+        if(features.length>0) {
+          waypointSource.addFeatures(features);
+        }
+      },
+      // 레이어 스타일
+      layerStyleFunc: (name, feature) => {
+        const { olMap, } = get();
+        // Cluster는 여러 개의 개별 피처를 하나의 클러스터로 그룹화합니다.
+        // Cluster를 사용하면, 클러스터에 포함된 개별 피처들을 get('features')를 통해 배열로 가져올 수 있습니다.
+        // 그래서 feature.get('features')는 클러스터 내부의 피처 배열을 반환합니다.
+        switch (name) {
+          case 'vertiportLayer': {
+            let img = (feature.get('status') == 'UNAVAILABLE' || feature.get('warning')) ? IC_VP_RED : IC_VP;
+            let style = [
+              new Style({
+                image: new Icon({
+                  src: img,
+                  scale: UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  opacity: 1
+                }),
+              }),
+              new Style({
+                text: new Text({
+                  text: feature.get('id'),
+                  font: 'normal normal normal 9px/11px Pretendard',
+                  fill: new Fill({
+                    color: '#ffffff',
+                  }),
+                  offsetY: 24 * UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  scale: UtilFunc.calculateScaleText(olMap.getView().getZoom()),
+                }),
+              }),
+            ];
+            if(feature.get('ETA')){
+              style.push(new Style({
+                text: new Text({
+                  text: feature.get('ETA'),
+                  font: 'normal normal normal 9px/11px Pretendard',
+                  fill: new Fill({
+                    color: '#d9d9d9',
+                  }),
+                  offsetY: 35 * UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  scale: UtilFunc.calculateScaleText(olMap.getView().getZoom()),
+                })
+              }))
+            }
+            return style
+          }
+          case 'waypointLayer': {
+            let style = [
+              new Style({
+                image: new Icon({
+                  src: IC_WP,
+                  scale: UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  opacity: 1
+                }),
+              }),
+              new Style({
+                text: new Text({
+                  text: feature.get('nm'),
+                  font: 'normal normal normal 9px/11px Pretendard',
+                  fill: new Fill({
+                    color: '#b3b3b3',
+                  }),
+                  offsetY: 25 * UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  scale: UtilFunc.calculateScaleText(olMap.getView().getZoom()),
+                }),
+              }),
+            ]
+            if(feature.get('ETA')){
+              style.push(new Style({
+                text: new Text({
+                  text: feature.get('ETA'),
+                  font: 'normal normal normal 9px/11px Pretendard',
+                  fill: new Fill({
+                    color: '#d9d9d9',
+                  }),
+                  offsetY: 25 * UtilFunc.calculateScale(olMap.getView().getZoom()),
+                  scale: UtilFunc.calculateScaleText(olMap.getView().getZoom()),
+                })
+              }))
+            }
+            return style
+          }
+          default:
+            break;
+        }
+      },
+      showVertiport: (vertiports, isCenter, isRemove) => {
+        const { olMap, actions: {getLayer, layerStyleFunc, addLayer, } } = get();
+        let features = [];
+        let vertiportLayer = getLayer('vertiportLayer');
+        let vertiportSource = vertiportLayer?.getSource();
+        if(!vertiportLayer){
+          vertiportSource = new VectorSource({
+            features: features
+          });
+          vertiportLayer = new VectorLayer({
+            source: vertiportSource,
+            zIndex: 3,
+            style: (feature) => layerStyleFunc('vertiportLayer', feature)
+          })
+          addLayer('vertiportLayer', vertiportLayer);
+        }
+        if(isRemove) vertiportSource.clear();
+        if(vertiports.length > 0) {
+          vertiports.forEach((ind) => {
+            let vertiport = vertiportSource.getFeatureById(ind.id);
+            if(!vertiport){
+                let coord = transform([ind.lon, ind.lat], 'EPSG:4326', 'EPSG:5179')
+                let newPoint = new Point(coord)
+                let feature = new Feature({
+                  geometry: newPoint,
+                  id: ind.id,
+                  nm: ind.name,
+                  status: ind.status,
+                  group: 'vertiport'
+                })
+                feature.setId(ind.id)
+                features.push(feature)
+            }else{
+              vertiportSource.removeFeature(vertiport);
+              features.push(vertiport)
+            }
+          })
+        }
+        if(features.length>0) {
+          vertiportSource.addFeatures(features); // 새로운 데이터 추가
+        }
+        if(isCenter){
+          olMap.getView().fit(vertiportSource.getExtent(),{
+            padding: [50, 50, 50, 50] // [top, right, bottom, left]
+          });
+        }
+      },
+      hideCorridors: (type, corridors) => {
+        const corridorStoreState = useCorridorStore.getState(); // zustand의 상태 가져오기
+        const { lines, actions: {getLayer}} = get();
+        let corridorLayer = getLayer('corridorLayer');
+        let corridorSource = corridorLayer?.getSource();
+        let corridorDashLayer = getLayer('corridorDashLayer');
+        let corridorDashSource = corridorDashLayer?.getSource();
+        let waypointLayer = getLayer('waypointLayer');
+        let waypointSource = waypointLayer?.getSource();
+        if(type=="mySector"){
+          if(corridorLayer) {
+            corridorSource.clear();
+          }
+          if(corridorDashLayer) {
+            corridorDashSource.getFeatures().forEach(ind=>{
+              if(!ind.get("selected")) corridorDashSource.removeFeature(ind);
+            })
+          }
+          if(waypointLayer) {
+            waypointSource.clear();
+          }
+        }else{
+          if(corridors){
+            corridorSource.getFeatures().forEach(ind=>{
+              corridors.map((jnd)=>{
+                if("cdPolygon_"+jnd.corridorCode == ind.getId()){
+                  delete lines.corridor[jnd.corridorCode];
+                  corridorSource.removeFeature(ind);
+                }
+              });
+            })
+            corridorDashSource.getFeatures().forEach(ind=>{
+              corridors.map((jnd)=>{
+                if("corridorText_"+jnd.corridorCode == ind.getId()){
+                  delete lines.corridorText[jnd.corridorCode];
+                  corridorDashSource.removeFeature(ind);
+                }else if(ind.getId().startsWith("corridor_Center_"+jnd.corridorCode)){
+                  delete lines.corridorCenter[ind.getId().replace("corridor_Center_","")];
+                  corridorDashSource.removeFeature(ind);
+                }
+              });
+            })
+    
+            let arrWP = []; // 이미 그려져 있는 waypoints
+            Object.keys(lines.corridor).forEach(ind=>{
+              corridorStoreState.corridorList.find(jnd=>jnd.corridorCode==ind).corridorDetail.map(jnd=>{
+                arrWP.push(jnd.waypointCode)
+              })
+            })
+            waypointLayer?.getSource().getFeatures().forEach(ind=>{
+              if(!arrWP.includes(ind.getId())){ // 이미 그려져 있는 waypoints 에 없는 포인트는 삭제
+                waypointSource.removeFeature(ind)
+              }
+            })
+          }else{
+            if(corridorLayer) {
+              corridorSource.clear();
+            }
+            if(corridorDashLayer) {
+              corridorDashSource.clear();
+            }
+            if(waypointLayer) {
+              waypointSource.clear();
+            }
+          }
+        }
+      }
     },
   };
 })

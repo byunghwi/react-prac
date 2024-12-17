@@ -12,8 +12,11 @@ export default function Register() {
   const [selectedRole, setSelectRole] = useState("");
   const [selectedAuth, setSelectedAuth] = useState([]);
   const [tempCorridorList, setTempCorridorList] = useState([]);
+  const [selectedCorridor, setSelectedCorridor] = useState("");
 
   const navigate = useNavigate();
+
+  const { actions: { drawCorridors, hideCorridors }} = useMapStore();
 
   const {
     roleList,
@@ -63,20 +66,21 @@ export default function Register() {
   const handleCheckVertiport = (e, target) => {
     if (e.target.checked) {
       setTempCorridorList([]);
-      setCorridorDetail("");
+      setSelectedCorridor("");
       let filtering = corridorList.filter(
         (ind) =>
           ind.departure == target.vertiportId ||
           ind.destination == target.vertiportId
       );
       setTempCorridorList(filtering);
-      //hideCorridors('mySector');
+      hideCorridors('mySector');
     }
   };
 
   const handleSelectCorridor = (e) => {
-    console.log("tempCorridorList", tempCorridorList);
-    //drawCorridors([tempCorridorList.find(ind=>ind.corridorCode==e.target.value)], 'mySector', true)
+    let selectCorridor = tempCorridorList.find(ind=>ind.corridorCode==e.target.value);
+    setSelectedCorridor(selectCorridor);
+    drawCorridors([selectCorridor], 'mySector', true);
   };
 
   const list = () => {
@@ -152,14 +156,13 @@ export default function Register() {
               <td>CORRIDOR</td>
               <td>
                 <select
-                  value={corridorDetail}
+                  value={selectedCorridor.corridorCode}
                   onChange={(e) => handleSelectCorridor(e)}
                 >
                   <option value="">== Select ==</option>
                   {tempCorridorList.map((corridor) => (
                     <option
                       key={corridor.corridorCode}
-                      value={corridor.corridorCode}
                     >
                       {corridor.corridorCode}
                     </option>

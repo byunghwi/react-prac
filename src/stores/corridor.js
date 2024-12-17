@@ -6,6 +6,7 @@ const useCorridorStore = create((set, get) => ({
   corridorDetail: {},
   selectedCorridors: [],
   mySector: [],
+  corridorTypes: [],
   SrchType: "",
   SrchValue: "",
   pageNo: 1,
