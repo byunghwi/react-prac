@@ -783,6 +783,12 @@ const useMapStore = create((set, get) => {
             }
           }
         }
+      },
+      hideVertiports: () => {
+        const { actions: { getLayer } } = get();
+        let vertiportLayer = getLayer('vertiportLayer');
+        let vertiportSource = vertiportLayer?.getSource();
+        if(vertiportLayer && vertiportSource) vertiportSource.clear();
       }
     },
   };

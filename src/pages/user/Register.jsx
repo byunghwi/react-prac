@@ -12,11 +12,11 @@ export default function Register() {
   const [selectedRole, setSelectRole] = useState("");
   const [selectedAuth, setSelectedAuth] = useState([]);
   const [tempCorridorList, setTempCorridorList] = useState([]);
-  const [selectedCorridor, setSelectedCorridor] = useState("");
+  const [selectedCorridor, setSelectedCorridor] = useState(null);
 
   const navigate = useNavigate();
 
-  const { actions: { drawCorridors, hideCorridors }} = useMapStore();
+  const { actions: { drawCorridors, hideCorridors, hideVertiports }} = useMapStore();
 
   const {
     roleList,
@@ -55,6 +55,13 @@ export default function Register() {
     }
     fetchData();
   }, []);
+
+  // selectedCorridor 상태가 변경될 때 실행
+  useEffect(() => {
+    if(selectedCorridor === "") {
+      hideVertiports();
+    }
+  }, [selectedCorridor]);
 
   const handleRoleChange = (target) => {
     setSelectRole(target);
@@ -156,7 +163,7 @@ export default function Register() {
               <td>CORRIDOR</td>
               <td>
                 <select
-                  value={selectedCorridor.corridorCode}
+                  value={selectedCorridor?.corridorCode || ''}
                   onChange={(e) => handleSelectCorridor(e)}
                 >
                   <option value="">== Select ==</option>
