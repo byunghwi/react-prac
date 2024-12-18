@@ -33,7 +33,7 @@ const useCorridorStore = create((set, get) => ({
       }
     },
     setCorridorDetail: (param) => set({corridorDetail: param}),
-    setMysector: (param) => set({mySector:param})
+    setMySector: (param) => set({mySector:param})
   }
 
 }))

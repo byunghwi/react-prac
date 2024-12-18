@@ -177,6 +177,18 @@ export default function Register() {
                 </select>
               </td>
             </tr>
+            <tr>
+              <td>WAYPOINT</td>
+              <td>
+                <ul>
+                  {mySector.map((item, index)=>(
+                    <li key={index}>
+                      {item.corridor} : {item.prev}-{item.next}
+                    </li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>

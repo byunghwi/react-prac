@@ -464,7 +464,7 @@ const useMapStore = create((set, get) => {
 
                   if (indexToRemove !== -1) {
                     mySector.splice(indexToRemove, 1);
-                    corridorStoreState.setMySector([...mySector]); // 새로운 배열로 상태 업데이트
+                    corridorStoreState.actions.setMySector([...mySector]); // 새로운 배열로 상태 업데이트
                   }
                 } else {
                   let centerStyle = function (feature) {
@@ -497,7 +497,7 @@ const useMapStore = create((set, get) => {
                     return a.corridor.localeCompare(b.corridor);
                   });
 
-                  corridorStoreState.setMySector([...mySector]); // 새로운 배열로 상태 업데이트
+                  corridorStoreState.actions.setMySector([...mySector]); // 새로운 배열로 상태 업데이트
                 }
               }
             }
