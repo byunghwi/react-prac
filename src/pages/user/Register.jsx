@@ -45,7 +45,7 @@ export default function Register() {
   useEffect(() => {
     async function fetchData() {
       try {
-        await getVertiportList();
+        await getVertiportList(null, {srchType: "", srchValue: ""}); // TODO : searchType, value 상태관리 추가
         await getCorridorList();
         await getRoleList();
         await getAuthList();

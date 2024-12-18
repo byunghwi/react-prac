@@ -4,24 +4,20 @@ import apiService from '../api/apiService';
 const useVertiportStore = create((set, get) => ({
   vertiportList:[],
   vertiportDetail:{},
-  SrchType:"",
-  SrchValue: "",
-  pageNo: 1,
   cntTotalList: 0,
   isMemoVP:false,
   selectedVertiports: [],
 
   actions: {
-    getVertiportList: async(isPaging) => {
+    getVertiportList: async(isPaging, pparams) => {
       try {
-        const { pageNo, SrchType, SrchValue } = get();
         let params = {dataType: "JSON"}
         if(isPaging){
-          params.pageNo = pageNo;
+          params.pageNo = pparams.pageNo;
           params.numOfRows = 10;
         }
-        params.srchType = SrchType;
-        params.srchValue = SrchValue;
+        params.srchType = pparams.srchType;
+        params.srchValue = pparams.srchValue;
         let result = await apiService.loadVertiportList(params);
         set({
           vertiportList: result.vertiportList,
