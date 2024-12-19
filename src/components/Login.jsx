@@ -56,7 +56,7 @@ export default function Login() {
                     aria-label="입력내용 삭제"
                     tabIndex="2"
                     onClick={() => setId("")} // ID 입력 필드 비우기
-                  ></button>
+                  >Clear</button>
                 </div>
                 <div>
                   <input
@@ -76,7 +76,7 @@ export default function Login() {
                     aria-label="입력내용 삭제"
                     tabIndex="4"
                     onClick={() => setPwd("")} // 비밀번호 입력 필드 비우기
-                  ></button>
+                  >Clear</button>
                 </div>
                 {isErr && (
                   <p className="warning">

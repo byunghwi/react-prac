@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import UtilFunc from "../../utils/functions";
 import useMapStore from "../../stores/map";
 import BaseMap from "../../components/BaseMap";
+import apiService from "../../api/apiService";
+import useModalStore from "../../stores/modal";
 
 export default function Register() {
   const navigate = useNavigate();
-  
+  const { isLoading, actions: {openModal, showLoading, hideLoading}} = useModalStore();
+
   const {
     actions: { showVertiport },
   } = useMapStore();
@@ -111,8 +114,63 @@ export default function Register() {
     navigate('/vertiport/list');
   }
 
-  const save = () => {
+  const save = async() => {
+    if(formData.vertiportId.length == 0) {
+      openModal('유효성검사',"id를 입력해 주세요.");
+      return false;
+    }
 
+    setFormData((prev) => {
+      const updatedData = { ...prev };
+
+      if (prev.fatoinfo.length === 0) {
+        updatedData.fatoinfo = [
+          {
+            fatoCode: "F1",
+            fatoLat: prev.vertiportLat,
+            fatoLon: prev.vertiportLon,
+          },
+        ];
+      }
+
+      if (prev.standinfo.length === 0) {
+        updatedData.standinfo = [
+          {
+            standCode: "S1",
+            standLat: prev.vertiportLat,
+            standLon: prev.vertiportLon,
+          },
+        ];
+      }
+
+      return updatedData;
+    });
+
+    let fRole = /^F\d*$/;
+    let sRole = /^S\d*$/;
+  
+    let chkValidation = formData.fatoinfo.reduce(
+      (tot, ind) => tot + (fRole.test(ind.fatoCode) ? 0 : 1),
+      0
+    );
+    if (chkValidation > 0) {
+      openModal("유효성검사", "FATO code는 F로 시작해야 합니다.");
+      return false;
+    }
+  
+    chkValidation = formData.standinfo.reduce(
+      (tot, ind) => tot + (sRole.test(ind.standCode) ? 0 : 1),
+      0
+    );
+    if (chkValidation > 0) {
+      openModal("유효성검사", "STAND code는 S로 시작해야 합니다.");
+      return false;
+    }
+  
+    showLoading();
+    console.log("저장 전 formData 확인 : ", formData);
+    await apiService.insertVertiportDetail(formData);
+    hideLoading();
   }
 
   return (

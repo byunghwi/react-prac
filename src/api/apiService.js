@@ -170,10 +170,28 @@ const loadCorridorList = (params) => {
   });
 }
 
+const insertVertiportDetail = async(data) => {
+  let config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/vertiport/insert`, data, config).then((response) => {
+    if(response.status=200){
+      return response.status
+    } else {
+      return response.statusText;
+    }
+  }).catch((error) => {
+    console.log('[apiService] insertVertiportDetail 정보를 받아오는 중 에러가 발생했습니다.', error);
+  })
+}
+
 export default {
   login, logout, 
   loadUserList, loadRoleList, loadAuthList, 
   modifyRole, saveRole, deleteRole, 
   loadLimitList, modifyLimit,
-  loadCorridorList, loadVertiportList
+  loadCorridorList, loadVertiportList, insertVertiportDetail
 }
