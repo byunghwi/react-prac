@@ -66,8 +66,9 @@ export default function Register() {
   const handleRoleChange = (target) => {
     setSelectRole(target);
     setSelectedAuth(
-      JSON.parse(roleList.find((ind) => ind.roleName == target).authorityKey)
+      target !== "" ? JSON.parse(roleList.find((ind) => ind.roleName == target).authorityKey) : []
     );
+    
   };
 
   const handleCheckVertiport = (e, target) => {
