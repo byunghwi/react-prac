@@ -7,6 +7,7 @@ import Auth from '../pages/auth/Auth'
 import AlertLimits from '../pages/AlertLimits'
 import VertiportList from '../pages/vertiport/List'
 import VertiportRegister from '../pages/vertiport/Register'
+import CorridorList from '../pages/corridor/List';
 
 function AppRoutes() {
   const location = useLocation();
@@ -50,16 +51,15 @@ function AppRoutes() {
           <Route path="register" element={<VertiportRegister />} />
         </Route>
         {/*    <Route path="detail/:id" element={<VertiportModify />} />
-        
+         */}
 
        
         <Route path="/corridor" element={<AdminMain />}>
           <Route path="list" element={<CorridorList />} />
-          <Route path="register" element={<CorridorRegister />} />
+           {/*    <Route path="register" element={<CorridorRegister />} />
           <Route path="detail/:id" element={<CorridorModify />} />
+           */}
         </Route>
-
-         */}
 
         <Route path="/alertLimits" element={<AdminMain />}>
           <Route path="" element={<AlertLimits />} />

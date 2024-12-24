@@ -13,7 +13,7 @@ export default function Menu() {
       </ul>
       <ul>
         <li><Link to="/vertiport/list">버티포트 관리</Link></li>
-        <li>회랑 관리</li>
+        <li><Link to="/corridor/list">회랑 관리</Link></li>
         <li><Link to="/alertLimits">경보 임계치 설정</Link></li>
       </ul>
       <ul>
