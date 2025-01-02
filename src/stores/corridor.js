@@ -6,23 +6,18 @@ const useCorridorStore = create((set, get) => ({
   corridorDetail: {},
   selectedCorridors: [],
   mySector: [],
-  corridorTypes: [],
-  SrchType: "",
-  SrchValue: "",
-  pageNo: 1,
   cntTotalList: 0,
 
   actions: {
-    getCorridorList: async (isPaging) => {
+    getCorridorList: async (isPaging, pparams) => {
       try {
-        const { pageNo, SrchType, SrchValue } = get();
         let params = { dataType: "JSON" }
         if (isPaging) {
-          params.pageNo = pageNo;
+          params.pageNo = pparams.pageNo;
           params.numOfRows = 10;
         }
-        params.srchType = SrchType;
-        params.srchValue = SrchValue;
+        params.srchType = pparams.srchType;
+        params.srchValue = pparams.srchValue;
         let result = await apiService.loadCorridorList(params);
         set({
           corridorList: result.corridorList,

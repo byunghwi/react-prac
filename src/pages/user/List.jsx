@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import useUserStore from '../../stores/user'; 
 import { useNavigate } from 'react-router-dom';
+import useModalStore from '../../stores/modal';
 
 export default function List() {
   const navigate = useNavigate();
   const [searchType, setSearchType] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [userList, setUserList] = useState([]);
-
+  const { actions: { showLoading, hideLoading } } = useModalStore();
   const {
     actions: { getUserList }
   } = useUserStore();
@@ -15,9 +16,12 @@ export default function List() {
   useEffect(() => {
     async function fetchData() {
       try {
+        showLoading();
         let userList = await getUserList(searchType, searchValue);
         setUserList(userList);
+        hideLoading();
       } catch (error) {
+        hideLoading();
         console.error('Error fetching data:', error);
       }
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCorridorStore from '../../stores/corridor'
+import useModalStore from '../../stores/modal';
 
 export default function List() {
   const navigate = useNavigate();
@@ -8,6 +9,9 @@ export default function List() {
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const { corridorList, actions: { getCorridorList }} = useCorridorStore();
+  const {
+    actions: { showLoading, hideLoading },
+  } = useModalStore();
 
   const handelSearchType = (e) => {
     setSrchType(e.target.value);
@@ -22,7 +26,10 @@ export default function List() {
   }
 
   const paginatedLoad = async(payload) => {
-
+    showLoading();
+    setPageNo(payload);
+    await getCorridorList(true, {pageNo: pageNo, srchType: srchType, srchValue: srchValue});
+    hideLoading();
   }
 
   const register = () => {

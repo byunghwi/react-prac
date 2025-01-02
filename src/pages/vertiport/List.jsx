@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import useVertiportStore from "../../stores/vertiport";
 import { useNavigate } from 'react-router-dom';
+import useModalStore from '../../stores/modal';
 
 export default function List() {
   const navigate = useNavigate();
@@ -8,6 +9,9 @@ export default function List() {
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const { vertiportList, actions: { getVertiportList }} = useVertiportStore();
+  const {
+    actions: { showLoading, hideLoading },
+  } = useModalStore();
 
   const handelSearchType = (e) => {
     console.log('handleSearch type...', e.target.value);
@@ -24,8 +28,10 @@ export default function List() {
   }
 
   const paginatedLoad = async(payload) => {
+    showLoading();
     setPageNo(payload);
     await getVertiportList(true, {pageNo: pageNo, srchType: srchType, srchValue: srchValue});
+    hideLoading();
   }
 
   useEffect(() => {
