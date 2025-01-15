@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import Utilfunc from "../utils/functions"
 import Queue from "../utils/queue"
+import useMapStore from "../stores/map";
+import apiService from "../api/apiService"
 
 const usePlaybackStore = create((set, get) => {
   return {
@@ -8,9 +10,14 @@ const usePlaybackStore = create((set, get) => {
     originQueue: new Queue(),
     socket: null,
     isWSMsgRequired: false,
+    wsDroneMarker: null,
+    wsDroneLabel: null,
+    wsLabelLine: null,
+    wsDroneVector: null,
+
 
     actions: {
-      connection: async () => {
+      connect: async () => {
         const uuid = Utilfunc.generateUUID();
         set({ playback_id: uuid });
         set({ socket: new WebSocket(`ws://211.189.132.21:7080/ws2?token_id=${uuid}`) });
@@ -73,13 +80,61 @@ const usePlaybackStore = create((set, get) => {
           }
         }
       },
-
+      disconnect: async () => {
+        const { socket } = get();
+        if (socket) {
+          socket.close(); // 연결 종료
+          set({ socket: null });
+          console.log('WebSocket connection closed');
+        }
+      },
       pushWsDroneData: async () => {
         console.log('pushWsDroneData..');
       },
+      loadPlayBack: async (params) => {
+        try {
+          let res = await apiService.loadPlayBack(params);
+          return res;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      pausePlayBack: async(params) => {
+        try {
+          let res = await apiService.pausePlayBack(params);
+          return res;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      stopPlayBack: async(params) => {
+        try {
+          let res = await apiService.stopPlayBack(params);
+          return res;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      setIsWSMsgRequired: (value) => set({ isWSMsgRequired: value }),
+      setWsDroneVector: (value) => set({ setWsDroneVector: value}),
 
-      stopPlayBack: () => {
-
+      removeWsDroneData: (id) =>{
+        // const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector } = get(); 
+        // const { olMap, dragOverlay, vectorSource } = useCorridorStore.getState(); // zustand의 상태 가져오기
+        // dragOverlay.removeOverlay(wsDroneLabel[id]);
+        // olMap.removeOverlay(olMap.value.getOverlayById(id));
+        // wsDroneMarker[id]?.remainCorridor && vectorSource.removeFeature(wsDroneMarker.value[id].remainCorridor);
+        // wsDroneMarker.value[id] && vectorSource.removeFeature(wsDroneMarker[id]);
+        // wsLabelLine.value[id] && vectorSource.removeFeature(wsLabelLine.value[id]);
+        // wsDroneVector[id] && vectorSource.removeFeature(wsDroneVector[id]);
+        // set(delete wsDroneMarker[id]);
+        // delete wsLabelLine[id];
+        // delete wsDroneLabel[id];
+        // delete wsDroneVector[id];
+    
+        // // 이착륙/충돌 시연 끄기
+        // isVisibleCollision3D.value && (isVisibleCollision3D.value = false);
+        // isVisibleLanding3D.value && (isVisibleLanding3D.value = false);
       }
     }
   }

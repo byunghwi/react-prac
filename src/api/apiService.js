@@ -71,8 +71,8 @@ const loadAuthList = () => {
   });
 }
 
-const modifyRole = async(data) => {
-  const config =  {
+const modifyRole = async (data) => {
+  const config = {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + sessionStorage.getItem('token')
@@ -85,11 +85,11 @@ const modifyRole = async(data) => {
   });
 }
 
-const saveRole = async(data) => {
-  const config =  {
+const saveRole = async (data) => {
+  const config = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     }
   }
   return axios.post(`/api/mng/role/insert`, data, config).then((response) => {
@@ -99,11 +99,11 @@ const saveRole = async(data) => {
   });
 }
 
-const deleteRole = async(data) => {
-  const config =  {
+const deleteRole = async (data) => {
+  const config = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     }
   }
   return axios.delete(`/api/mng/role/delete/${data}`, config).then((response) => {
@@ -117,7 +117,7 @@ const loadLimitList = () => {
   return axios.get(`/api/mng/warning`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     },
   }).then((response) => {
     return response.data;
@@ -126,11 +126,11 @@ const loadLimitList = () => {
   });
 }
 
-const modifyLimit = async(data) => {
-  const config =  {
+const modifyLimit = async (data) => {
+  const config = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     }
   }
   return axios.post(`/api/mng/warning/update`, data, config).then((response) => {
@@ -144,7 +144,7 @@ const loadVertiportList = (params) => {
   return axios.get(`/api/mng/vertiport`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     },
     params: params
   }).then((response) => {
@@ -159,7 +159,7 @@ const loadCorridorList = (params) => {
   return axios.get(`/api/mng/corridor`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     },
     params: params
   }).then((response) => {
@@ -170,15 +170,15 @@ const loadCorridorList = (params) => {
   });
 }
 
-const insertVertiportDetail = async(data) => {
+const insertVertiportDetail = async (data) => {
   let config = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ sessionStorage.getItem('token')
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
     }
   }
   return axios.post(`/api/mng/vertiport/insert`, data, config).then((response) => {
-    if(response.status=200){
+    if (response.status = 200) {
       return response.status
     } else {
       return response.statusText;
@@ -188,10 +188,75 @@ const insertVertiportDetail = async(data) => {
   })
 }
 
+const loadPlayBack = async (data) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/aircraft/get-playback-data`, data, config).then((response) => {
+    console.log("[apiService] loadPlayBack response: ", response);
+    if (response.status == 200) {
+      return response.status;
+    } else {
+      return response.statusText;
+    }
+  }).catch((error) => {
+    console.log('[apiService] loadPlayBack 정보를 받아오는 중 에러가 발생했습니다.', error);
+    return error;
+  });
+}
+
+const pausePlayBack = async (data) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/aircraft/pause`, data, config).then((response) => {
+    console.log("[apiService] pausePlayBack response: ", response);
+    if (response.status == 200) {
+      return response.status;
+    } else {
+      return response.statusText;
+    }
+  }).catch((error) => {
+
+    console.log('[apiService] pausePlayBack 정보를 받아오는 중 에러가 발생했습니다.', error);
+    return error;
+
+  });
+}
+
+const stopPlayBack = async (data) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/mng/aircraft/stop`, data, config).then((response) => {
+    console.log("[apiService] stopPlayBack response: ", response);
+    if (response.status == 200) {
+      return response.status;
+    } else {
+      return response.statusText;
+    }
+  }).catch((error) => {
+
+    console.log('[apiService] stopPlayBack 정보를 받아오는 중 에러가 발생했습니다.', error);
+    return error;
+
+  });
+}
+
 export default {
-  login, logout, 
-  loadUserList, loadRoleList, loadAuthList, 
-  modifyRole, saveRole, deleteRole, 
+  login, logout,
+  loadUserList, loadRoleList, loadAuthList,
+  modifyRole, saveRole, deleteRole,
   loadLimitList, modifyLimit,
-  loadCorridorList, loadVertiportList, insertVertiportDetail
+  loadCorridorList, loadVertiportList, insertVertiportDetail,
+  loadPlayBack, pausePlayBack, stopPlayBack,
 }
