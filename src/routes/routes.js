@@ -9,6 +9,7 @@ import VertiportList from '../pages/vertiport/List'
 import VertiportRegister from '../pages/vertiport/Register'
 import CorridorList from '../pages/corridor/List';
 import CorridorRegister from '../pages/corridor/Register';
+import Playback from '../pages/playback/Playback';
 
 function AppRoutes() {
   const location = useLocation();
@@ -65,6 +66,10 @@ function AppRoutes() {
 
         <Route path="/alertLimits" element={<AdminMain />}>
           <Route path="" element={<AlertLimits />} />
+        </Route>
+
+        <Route path="/playback" element={<AdminMain />}>
+          <Route path="list" element={<Playback />} />
         </Route>
         
       </Routes>

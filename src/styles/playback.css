@@ -1,0 +1,37 @@
+.wrap-reg{
+  input[type=text] {
+    margin-left: 10px;
+    box-sizing: border-box;
+    padding: 5px;
+    width: 200px;
+    height:90%;
+    border: 1px solid #666;
+  }
+  select {
+    box-sizing: border-box;
+    padding: 5px;
+    background-color: #464951;
+    color: #fff;
+    margin-left: 10px;
+  }
+}
+/* .datepicker{
+  margin-left: 10px;
+  width: 345px;
+  display: inline-block;
+  font-size: 12px;
+} */
+.search{
+  text-align: right;
+  display: inline-block;
+  width: calc(100% - 300px)
+}
+
+.react-datepicker-ignore-onclickoutside {
+  border: 1px solid #00ccff !important;
+  outline: none;
+}
+
+.react-datepicker__tab-loop {
+  position: absolute;
+}
