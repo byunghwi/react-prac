@@ -24,6 +24,7 @@ import IC_VP from '../assets/icon/ic_vertiport_grey.svg';
 import IC_VP_RED from '../assets/icon/ic_vertiport_red.svg';
 import * as turf from '@turf/turf';
 import UtilFunc from "../utils/functions";
+import ol_interaction_DragOverlay from "ol-ext/interaction/DragOverlay"
 
 proj4.defs('EPSG:5179', '+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
 register(proj4);
@@ -94,8 +95,19 @@ const useMapStore = create((set, get) => {
         fill: new Fill({ color: `rgba(0,0,0,0)` }),
       }),
     ],
+    nowZoom: 0,
+    mapRotation: 0,
+    dragOverlay: null,
 
     actions: {
+      checkZoom: () =>{
+        const { olMap } = get();
+        if (olMap) {
+          set((state) => ({ nowZoom: state.olMap.getView().getZoom() }));
+        } else {
+          console.log('olMap이 존재하지 않음'); // olMap이 없을 경우 로그 출력
+        }
+      },
       drawCorridors: (corridors, group, isCenter) => {
         const { olMap, lines, myCorridor, hideStyle, actions: {getLayer, addLayer, transformCoords, addFeaturePoint, showVertiport}} = get();
         const corridorStoreState = useCorridorStore.getState(); // zustand의 상태 가져오기
@@ -327,7 +339,7 @@ const useMapStore = create((set, get) => {
         }
       },
       initMap: async (map) => {
-        const { olMap, vectorLayer, layerGroup, actions: {addLayer, mapEvent, transformCoords} } = get();
+        const { olMap, vectorLayer, layerGroup, actions: {addLayer, mapEvent, transformCoords, checkZoom} } = get();
         set((state) => ({
           ...state,
           layerGroup: {}, // 새로운 layerGroup으로 업데이트
@@ -421,6 +433,18 @@ const useMapStore = create((set, get) => {
         addLayer('dimLayer', dimLayer);
 
         layerGroup[tileNames_en[0]].setVisible(true);
+
+        // dragOverlay 설정
+        set((state) => {
+          const overlay = new ol_interaction_DragOverlay({ 
+            overlays: [],
+            centerOnClick: false,});
+          state.olMap.addInteraction(overlay); // 상태 참조 후 즉시 작업 수행
+          return { dragOverlay: overlay }; // 상태 업데이트
+        });
+
+        get().olMap.on('moveend', checkZoom)
+        
         mapEvent();
       },
       mapEvent: () => {

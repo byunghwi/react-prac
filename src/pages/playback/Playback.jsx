@@ -49,7 +49,7 @@ export default function Playback() {
           if (originQueue && !originQueue.isEmpty()) {
             clearInterval(waitForQueue);
             console.log('큐에 데이터가 감지됨. 큐 처리 시작');
-            //processNextQueue();
+            processNextQueue();
           }
         }, 500)
         

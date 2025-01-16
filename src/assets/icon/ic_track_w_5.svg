@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g id="ic_track_w_5" transform="translate(-987 -363)">
+    <g id="그룹_5181" data-name="그룹 5181" transform="translate(-111 -247)">
+      <g id="타원_208" data-name="타원 208" transform="translate(1098 610)" fill="none" stroke="#d9d9d9" stroke-width="2">
+        <circle cx="16" cy="16" r="16" stroke="none"/>
+        <circle cx="16" cy="16" r="15" fill="none"/>
+      </g>
+      <circle id="타원_209" data-name="타원 209" cx="5" cy="5" r="5" transform="translate(1109 621)" fill="#d9d9d9"/>
+    </g>
+  </g>
+</svg>

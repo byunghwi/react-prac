@@ -252,6 +252,29 @@ const stopPlayBack = async (data) => {
   });
 }
 
+const saveSetting = async (data) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+    }
+  }
+  return axios.post(`/api/user/add-user-map-setting`, data, config).then((response) => {
+    console.log("[apiService] saveSetting response: ", response);
+    if (response.status == 200) {
+      return response.status;
+    } else {
+      return response.statusText;
+    }
+  }).catch((error) => {
+
+    console.log('[apiService] saveSetting 정보를 받아오는 중 에러가 발생했습니다.', error);
+    return error;
+
+  });
+}
+
+
 export default {
   login, logout,
   loadUserList, loadRoleList, loadAuthList,
@@ -259,4 +282,5 @@ export default {
   loadLimitList, modifyLimit,
   loadCorridorList, loadVertiportList, insertVertiportDetail,
   loadPlayBack, pausePlayBack, stopPlayBack,
+  saveSetting, 
 }
