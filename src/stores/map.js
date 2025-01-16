@@ -25,6 +25,7 @@ import IC_VP_RED from '../assets/icon/ic_vertiport_red.svg';
 import * as turf from '@turf/turf';
 import UtilFunc from "../utils/functions";
 import ol_interaction_DragOverlay from "ol-ext/interaction/DragOverlay"
+import usePlaybackStore from "./playback";
 
 proj4.defs('EPSG:5179', '+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
 register(proj4);
@@ -448,7 +449,8 @@ const useMapStore = create((set, get) => {
         mapEvent();
       },
       mapEvent: () => {
-        const { olMap } = get();
+        const { olMap, dragOverlay } = get();
+        const { wsDroneMarker, wsDroneLabel, wsLabelLine } = usePlaybackStore.getState();
 
         // [1] 마우스 오버
         olMap.on('pointermove', function (e) {
@@ -527,6 +529,42 @@ const useMapStore = create((set, get) => {
             }
           });
         });
+
+
+        // [4] label 드래그 이벤트
+        dragOverlay.on('dragstart', function (e) {
+          let overlayGroup = e.overlay.getElement().classList[0];
+          if (overlayGroup == 'drone_label') {
+            wsDroneLabel[e.overlay.getId()].isDragging = true;
+            wsDroneMarker[e.overlay.getId()].isTarget = false;
+          }
+        })
+        dragOverlay.on('dragging', function (e) {
+          let overlayGroup = e.overlay.getElement().classList[0];
+          /* eslint-disable no-empty */
+          if (overlayGroup == 'drone_label') {
+            let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
+            wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
+          } else if (overlayGroup == 'ol-DST' || overlayGroup == 'ol-DST-last') {
+            let linePoint = e.overlay.get('measureLine').getGeometry().getCoordinates()[0];
+            e.overlay.get('measureLine').getGeometry().setCoordinates([linePoint, e.coordinate]);
+          }
+        });
+        dragOverlay.on('dragend', function (e) {
+          let overlayGroup = e.overlay.getElement().classList[0];
+          if (overlayGroup == 'drone_label') {
+            let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
+            let sPixel = olMap.getPixelFromCoordinate(drone);
+            let ePixel = olMap.getPixelFromCoordinate(e.coordinate);
+            let x = ePixel[0] - sPixel[0];
+            let y = ePixel[1] - sPixel[1];
+            wsDroneLabel[e.overlay.getId()].set('x', x)
+            wsDroneLabel[e.overlay.getId()].set('y', y)
+            wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
+            wsDroneLabel[e.overlay.getId()].isDragging = false;
+          }
+        });
+
       },
       // 레이어 추가
       addLayer: (name, layer) => {

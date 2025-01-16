@@ -264,7 +264,6 @@ const usePlaybackStore = create((set, get) => {
         const { applyFilter, filteredAltitude, wsDroneMarker, wsDroneLabel, wsLabelLine, isShowVector, actions: {styleFunction, createDroneLabel, updateDroneLabel} }  = get();
         const { olMap, vectorSource, actions: { getLayer } } = useMapStore.getState();
         const { FPLList } = useFPLStore.getState();
-        console.log();
         let flightPlanIdentifier = payload.result.flightPlanIdentifier;
         if(flightPlanIdentifier==undefined) flightPlanIdentifier = "test-identifier";
         if(payload.result.gps_lat == 0 || payload.result.gps_lon == 0 || payload.result.gps_lat >= 360 || payload.result.gps_lon >= 360){
