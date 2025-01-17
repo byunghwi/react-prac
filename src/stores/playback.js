@@ -243,22 +243,29 @@ const usePlaybackStore = create((set, get) => {
       },
 
       removeWsDroneData: (id) =>{
-        // const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector } = get(); 
-        // const { olMap, dragOverlay, vectorSource } = useCorridorStore.getState(); // zustand의 상태 가져오기
-        // dragOverlay.removeOverlay(wsDroneLabel[id]);
-        // olMap.removeOverlay(olMap.getOverlayById(id));
-        // wsDroneMarker[id]?.remainCorridor && vectorSource.removeFeature(wsDroneMarker[id].remainCorridor);
-        // wsDroneMarker[id] && vectorSource.removeFeature(wsDroneMarker[id]);
-        // wsLabelLine[id] && vectorSource.removeFeature(wsLabelLine[id]);
-        // wsDroneVector[id] && vectorSource.removeFeature(wsDroneVector[id]);
-        // set(delete wsDroneMarker[id]);
-        // delete wsLabelLine[id];
-        // delete wsDroneLabel[id];
-        // delete wsDroneVector[id];
-    
-        // // 이착륙/충돌 시연 끄기
-        // isVisibleCollision3D && (isVisibleCollision3D = false);
-        // isVisibleLanding3D && (isVisibleLanding3D = false);
+        set((state)=> {
+          const { olMap, vectorSource, dragOverlay } = useMapStore.getState();
+          const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector } = state;
+  
+          const newWsDroneMarker = { ...wsDroneMarker };
+          const newWsLabelLine = { ...wsLabelLine };
+          const newWsDroneLabel = { ...wsDroneLabel };
+          const newWsDroneVector = { ...wsDroneVector };
+  
+          dragOverlay.removeOverlay(newWsDroneLabel[id]);
+          olMap.removeOverlay(olMap.getOverlayById(id));
+          newWsDroneMarker[id]?.remainCorridor && vectorSource.removeFeature(newWsDroneMarker[id].remainCorridor);
+          newWsDroneMarker[id] && vectorSource.removeFeature(newWsDroneMarker[id]);
+          newWsLabelLine[id] && vectorSource.removeFeature(newWsLabelLine[id]);
+          newWsDroneVector[id] && vectorSource.removeFeature(newWsDroneVector[id]);
+  
+          delete newWsDroneMarker[id];
+          delete newWsLabelLine[id];
+          delete newWsDroneLabel[id];
+          delete newWsDroneVector[id];
+  
+          return { wsDroneMarker: newWsDroneMarker, wsLabelLine: newWsLabelLine, wsDroneLabel: newWsDroneLabel, wsDroneVector: newWsDroneVector };
+        })
       },
       pushWsDroneData: async (payload) => {
         const { applyFilter, filteredAltitude, wsDroneMarker, wsDroneLabel, wsLabelLine, isShowVector, actions: {styleFunction, createDroneLabel, updateDroneLabel} }  = get();
