@@ -11,7 +11,7 @@ import cloneDeep from 'lodash';
 export default function Playback() {
   //store
   const { playback_id, isWSMsgRequired, originQueue, wsDroneMarker, 
-    actions: { connect, disconnect, loadPlayBack, pausePlayBack, stopPlayBack, setIsWSMsgRequired, removeWsDroneData, pushWsDroneData }} = usePlaybackStore();
+    actions: { connect, disconnect, loadPlayBack, pausePlayBack, stopPlayBack, setIsWSMsgRequired, removeWsDroneData, pushWsDroneData, setOriginqueue }} = usePlaybackStore();
 
   //내부
   const [playState, setPlayState] = useState("stop");

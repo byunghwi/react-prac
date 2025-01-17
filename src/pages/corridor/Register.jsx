@@ -23,9 +23,7 @@ export default function Register() {
     corridorLinkPolygon: null,
   });
 
-  const {
-    actions: { showLoading, hideLoading },
-  } = useModalStore();
+  const { showLoading, hideLoading } = useModalStore();
 
   const {
     actions: { getVertiportList },
@@ -43,7 +41,7 @@ export default function Register() {
       try {
         showLoading();
         await getVertiportList(null, { srchType: "", srchValue: "" }); // TODO : searchType, value 상태관리 추가
-        hideLoading();  
+        hideLoading();
       } catch (error) {
         console.error(error);
       }

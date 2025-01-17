@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45">
+  <g id="ic_notification" transform="translate(-4535 -43)">
+    <g id="그룹_1255" data-name="그룹 1255" transform="translate(2918 10)">
+      <g id="타원_178" data-name="타원 178" transform="translate(1617 33)" fill="#282b32" stroke="#73767f" stroke-width="1">
+        <circle cx="22.5" cy="22.5" r="22.5" stroke="none"/>
+        <circle cx="22.5" cy="22.5" r="22" fill="none"/>
+      </g>
+      <g id="btn_alret" transform="translate(1627 43)">
+        <rect id="사각형_605" data-name="사각형 605" width="24" height="24" fill="none"/>
+        <g id="그룹_4994" data-name="그룹 4994" transform="translate(-302.645 -341.585)">
+          <path id="패스_43946" data-name="패스 43946" d="M321.089,358.766a.739.739,0,0,0,.411-.1.729.729,0,0,0,.268-1l-.753-1.213a1.922,1.922,0,0,1-.292-1.013v-4.438a5.887,5.887,0,0,0-5.214-5.762,6.5,6.5,0,0,0-.776-.043h-.176a6.5,6.5,0,0,0-.776.043,5.885,5.885,0,0,0-5.214,5.763v4.438a1.921,1.921,0,0,1-.292,1.013l-.753,1.213a.728.728,0,0,0,.679,1.091h12.888Z" fill="#d9d9d9"/>
+          <path id="패스_43947" data-name="패스 43947" d="M312.429,359.806a2.217,2.217,0,0,0,4.432,0Z" fill="#d9d9d9"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

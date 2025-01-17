@@ -8,7 +8,7 @@ export default function Modal({ isOpen, onClose }) {
     modalMsg,
     isModalOK,
     isLoading,
-    actions: { setModalOK },
+    setModalOK,
   } = useModalStore();
 
   const closeModal = () => {

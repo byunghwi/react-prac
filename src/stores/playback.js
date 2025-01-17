@@ -818,6 +818,9 @@ const usePlaybackStore = create((set, get) => {
           wsLabelLine[id].set('color', lineColor);
           wsLabelLine[id].set('width', designAircrft.border);
         }
+      },
+      setOriginqueue: () => {
+        set({originQueue: new Queue()});
       }
     }
   }

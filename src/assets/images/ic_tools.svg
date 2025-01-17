@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="ic_tools" transform="translate(12 11)">
+    <rect id="사각형_2516" data-name="사각형 2516" width="40" height="40" rx="10" transform="translate(-12 -11)" fill="#1b1c1f"/>
+    <path id="패스_43856" data-name="패스 43856" d="M52.474,5.934" transform="translate(-37.166 -5.934)" fill="none" stroke="#d9d9d9" stroke-width="1.2"/>
+    <path id="패스_43859" data-name="패스 43859" d="M0,0,5.406.008l.029,18.245L.029,18.245Z" transform="translate(0 4.705) rotate(-45)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-width="1.2"/>
+    <path id="패스_43857" data-name="패스 43857" d="M16.94,37.2l-3.1,3.1-4.466.781.781-4.466,3.1-3.1Z" transform="translate(-8.657 -24.209)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/>
+    <path id="패스_43858" data-name="패스 43858" d="M35.88,17.6l2.731-2.731.839-.839a2.5,2.5,0,0,0-.165-3.521,2.5,2.5,0,0,0-3.521-.164l-.839.839L32.195,13.91Z" transform="translate(-23.728 -8.424)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/>
+    <line id="선_620" data-name="선 620" x1="3.578" y1="3.578" transform="translate(2.147 12.1)" fill="none" stroke="#d9d9d9" stroke-width="1.2"/>
+    <line id="선_621" data-name="선 621" x1="3.578" y1="3.578" transform="translate(11.264 3.036)" fill="none" stroke="#d9d9d9" stroke-width="1.2"/>
+    <rect id="사각형_2508" data-name="사각형 2508" width="1.687" height="0.99" transform="translate(3.83 3.274) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2509" data-name="사각형 2509" width="1.687" height="0.99" transform="translate(5.234 4.674) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2510" data-name="사각형 2510" width="1.687" height="0.99" transform="translate(6.639 6.073) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2511" data-name="사각형 2511" width="1.687" height="0.99" transform="translate(8.043 7.472) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2512" data-name="사각형 2512" width="1.687" height="0.99" transform="translate(9.448 8.872) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2513" data-name="사각형 2513" width="1.687" height="0.99" transform="translate(10.852 10.271) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2514" data-name="사각형 2514" width="1.687" height="0.99" transform="translate(12.256 11.671) rotate(-45)" fill="#d9d9d9"/>
+    <rect id="사각형_2515" data-name="사각형 2515" width="1.687" height="0.99" transform="translate(13.665 13.07) rotate(-45)" fill="#d9d9d9"/>
+  </g>
+</svg>

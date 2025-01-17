@@ -9,13 +9,11 @@ export default function List() {
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const { corridorList, actions: { getCorridorList }} = useCorridorStore();
-  const {
-    actions: { showLoading, hideLoading },
-  } = useModalStore();
+  const { showLoading, hideLoading } = useModalStore();
 
   const handelSearchType = (e) => {
     setSrchType(e.target.value);
-  } 
+  }
 
   const handleSearchValue = (e) => {
     setSrchValue(e.target.value);
@@ -35,7 +33,7 @@ export default function List() {
   const register = () => {
     navigate('/corridor/register');
   }
-  
+
   const modify = (ci) => {
     navigate('/corridor/detail/'+ci)
   }

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="ic_building_pressed" transform="translate(-1855 -160)">
+    <rect id="사각형_2516" data-name="사각형 2516" width="40" height="40" rx="10" transform="translate(1855 160)" fill="#5d93ff"/>
+    <g id="그룹_4884" data-name="그룹 4884" transform="translate(-915.957 -1900.776)">
+      <g id="그룹_4859" data-name="그룹 4859" transform="translate(2790.971 2071.776)">
+        <path id="패스_43864" data-name="패스 43864" d="M2820.207,2089.776h-8a.5.5,0,0,1-.491-.5v-16.993a.5.5,0,0,1,.491-.5h8a.5.5,0,0,1,.491.5v16.993A.5.5,0,0,1,2820.207,2089.776Zm-7.512-1.007h7.021v-15.987h-7.021Z" transform="translate(-2811.712 -2071.776)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+      </g>
+      <g id="그룹_4860" data-name="그룹 4860" transform="translate(2782.957 2078.078)">
+        <path id="패스_43865" data-name="패스 43865" d="M2791.452,2104.563h-8a.491.491,0,0,1-.491-.491v-10.715a.491.491,0,0,1,.491-.491h8a.491.491,0,0,1,.491.491v10.715A.491.491,0,0,1,2791.452,2104.563Zm-7.512-.982h7.021v-9.733h-7.021Z" transform="translate(-2782.957 -2092.866)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+      </g>
+      <g id="그룹_4876" data-name="그룹 4876" transform="translate(2793.054 2074.943)">
+        <g id="그룹_4863" data-name="그룹 4863" transform="translate(0 0)">
+          <g id="그룹_4861" data-name="그룹 4861">
+            <path id="패스_43866" data-name="패스 43866" d="M2820.9,2083.361h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2819.196 -2082.379)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4862" data-name="그룹 4862" transform="translate(2.625)">
+            <path id="패스_43867" data-name="패스 43867" d="M2830.331,2083.361h-1.212a.491.491,0,1,1,0-.982h1.212a.491.491,0,0,1,0,.982Z" transform="translate(-2828.628 -2082.379)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+        <g id="그룹_4866" data-name="그룹 4866" transform="translate(0 2.671)">
+          <g id="그룹_4864" data-name="그룹 4864">
+            <path id="패스_43868" data-name="패스 43868" d="M2820.9,2092.957h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2819.196 -2091.975)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4865" data-name="그룹 4865" transform="translate(2.625)">
+            <path id="패스_43869" data-name="패스 43869" d="M2830.331,2092.957h-1.212a.491.491,0,1,1,0-.982h1.212a.491.491,0,0,1,0,.982Z" transform="translate(-2828.628 -2091.975)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+        <g id="그룹_4869" data-name="그룹 4869" transform="translate(0 5.341)">
+          <g id="그룹_4867" data-name="그룹 4867">
+            <path id="패스_43870" data-name="패스 43870" d="M2820.9,2102.551h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2819.196 -2101.569)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4868" data-name="그룹 4868" transform="translate(2.625)">
+            <path id="패스_43871" data-name="패스 43871" d="M2830.331,2102.551h-1.212a.491.491,0,1,1,0-.982h1.212a.491.491,0,0,1,0,.982Z" transform="translate(-2828.628 -2101.569)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+        <g id="그룹_4872" data-name="그룹 4872" transform="translate(0 8.012)">
+          <g id="그룹_4870" data-name="그룹 4870">
+            <path id="패스_43872" data-name="패스 43872" d="M2820.9,2112.146h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2819.196 -2111.164)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4871" data-name="그룹 4871" transform="translate(2.625)">
+            <path id="패스_43873" data-name="패스 43873" d="M2830.331,2112.146h-1.212a.491.491,0,1,1,0-.982h1.212a.491.491,0,0,1,0,.982Z" transform="translate(-2828.628 -2111.164)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+        <g id="그룹_4875" data-name="그룹 4875" transform="translate(0 10.683)">
+          <g id="그룹_4873" data-name="그룹 4873">
+            <path id="패스_43874" data-name="패스 43874" d="M2820.9,2121.74h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2819.196 -2120.758)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4874" data-name="그룹 4874" transform="translate(2.625)">
+            <path id="패스_43875" data-name="패스 43875" d="M2830.331,2121.74h-1.212a.491.491,0,1,1,0-.982h1.212a.491.491,0,0,1,0,.982Z" transform="translate(-2828.628 -2120.758)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+      </g>
+      <g id="그룹_4883" data-name="그룹 4883" transform="translate(2785.041 2083.08)">
+        <g id="그룹_4879" data-name="그룹 4879" transform="translate(0 0)">
+          <g id="그룹_4877" data-name="그룹 4877">
+            <path id="패스_43876" data-name="패스 43876" d="M2792.144,2112.146h-1.211a.491.491,0,1,1,0-.982h1.211a.491.491,0,1,1,0,.982Z" transform="translate(-2790.442 -2111.164)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4878" data-name="그룹 4878" transform="translate(2.625)">
+            <path id="패스_43877" data-name="패스 43877" d="M2801.577,2112.146h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2799.874 -2111.164)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+        <g id="그룹_4882" data-name="그룹 4882" transform="translate(0 2.67)">
+          <g id="그룹_4880" data-name="그룹 4880">
+            <path id="패스_43878" data-name="패스 43878" d="M2792.144,2121.74h-1.211a.491.491,0,1,1,0-.982h1.211a.491.491,0,1,1,0,.982Z" transform="translate(-2790.442 -2120.758)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+          <g id="그룹_4881" data-name="그룹 4881" transform="translate(2.625)">
+            <path id="패스_43879" data-name="패스 43879" d="M2801.577,2121.74h-1.212a.491.491,0,0,1,0-.982h1.212a.491.491,0,1,1,0,.982Z" transform="translate(-2799.874 -2120.758)" fill="#fff" stroke="#fff" stroke-width="0.2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

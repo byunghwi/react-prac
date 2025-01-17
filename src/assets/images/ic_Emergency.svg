@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18">
+  <g id="ic_Emergency" transform="translate(-1466.294 -130.831)">
+    <g id="alert-triangle" transform="translate(1466.294 130.831)">
+      <path id="패스_43961" data-name="패스 43961" d="M9.644,4.358a3.064,3.064,0,0,1,5.3,0l6.9,11.71a3.146,3.146,0,0,1-2.65,4.763H5.39a3.146,3.146,0,0,1-2.65-4.763Z" transform="translate(-2.294 -2.831)" fill="#ff7987"/>
+      <line id="선_341" data-name="선 341" y2="5" transform="translate(9.893 6.056)" fill="none" stroke="#282b32" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <line id="선_342" data-name="선 342" x2="0.009" transform="translate(9.894 14.118)" fill="none" stroke="#282b32" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

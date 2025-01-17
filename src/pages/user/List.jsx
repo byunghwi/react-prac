@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useUserStore from '../../stores/user'; 
+import useUserStore from '../../stores/user';
 import { useNavigate } from 'react-router-dom';
 import useModalStore from '../../stores/modal';
 
@@ -8,7 +8,7 @@ export default function List() {
   const [searchType, setSearchType] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [userList, setUserList] = useState([]);
-  const { actions: { showLoading, hideLoading } } = useModalStore();
+  const { showLoading, hideLoading } = useModalStore();
   const {
     actions: { getUserList }
   } = useUserStore();
@@ -38,8 +38,8 @@ export default function List() {
 
   const handleRegisterClick = () => {
     navigate("/user/register")
-  } 
-  
+  }
+
   return (
     <div className="wrap-list">
       <div className="title">관제 업무 관리</div>

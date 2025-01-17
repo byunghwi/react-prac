@@ -1,0 +1,44 @@
+/******************************************************************* 
+// 위치 : src/assets/scss/variables.scss 
+// 설명 : 프로젝트 전체에 적용되는 변수에 대해 정의함 
+// 주의 : 컴포넌트 갯수 만큼 실행되기 때문에 변수에 대해서만 정의해야합니다.          
+(실제 CSS에 대한 적용은 _index.scss에 작성)
+//        이 파일은 vue.config.js에 설정되면 됨 ********************************************************************/
+// vuetify를 사용할 경우 vuetify의 일부 변수를 사용할 수 있음 @import "~vuetify/src/styles/styles.sass";   
+// Vuetify Globals // Vuetify에 자동으로 오버라이드 됨 /////////////////////////////////////////////// 
+
+$font-family-base: "Pretendard";
+$border-radius-root: 6px; 
+$font-size-root: 14px;   
+ //font-weight
+ $bold : 600;
+ $medium : 500;
+ $normal : 400;
+// 사용자 정의 변수
+// 여기에 메인컬러, 서브컬러 등의 변수를 설정하면 SCSS 어디에서도 사용할 수 있습니다.  ////////////////////////////////////////////// 
+
+$color-red-1 : #EB4E02;
+$color-red-2:#FF263D; 
+$color-orange-1 : #eb9602;
+$color-sub : #1b1c1f; 
+$color-blue:#5D93FF;
+
+$color-gray-1 : #D9D9D9; 
+$color-gray-2 : #464951; 
+$color-gray-3 : #73767f;
+$color-gray-4 : #282b32;
+$color-gray-5 : #9d9ea3;
+$border-grey:#73767f;
+
+$primary-color:#5D93FF;
+$primary_blue:#457BE2;
+$primary_black:#121316;
+$primary_purple:#8336DB;
+$primary_green:#26c97e;
+$chart_green:#33DAA2;
+$chart_lightGreen:#71F37E;
+$light-blue:#A2BDF0;
+$light-purple:#F6F4FF;
+$light-green:#E9FAFA;
+$bg-grey:#F9FAFB;
+$grey:#F2F4F7;

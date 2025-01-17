@@ -8,7 +8,7 @@ import useModalStore from "../../stores/modal";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { isLoading, actions: {openModal, showLoading, hideLoading}} = useModalStore();
+  const { isLoading, showLoading, hideLoading } = useModalStore();
 
   const {
     actions: { showVertiport },
@@ -73,7 +73,7 @@ export default function Register() {
       // }, 1);
     }else{
       setFormData((prev)=>({
-        ...prev, 
+        ...prev,
         standinfo: [
           ...prev.standinfo,
           {
@@ -148,7 +148,7 @@ export default function Register() {
 
     let fRole = /^F\d*$/;
     let sRole = /^S\d*$/;
-  
+
     let chkValidation = formData.fatoinfo.reduce(
       (tot, ind) => tot + (fRole.test(ind.fatoCode) ? 0 : 1),
       0
@@ -157,7 +157,7 @@ export default function Register() {
       openModal("유효성검사", "FATO code는 F로 시작해야 합니다.");
       return false;
     }
-  
+
     chkValidation = formData.standinfo.reduce(
       (tot, ind) => tot + (sRole.test(ind.standCode) ? 0 : 1),
       0
@@ -166,7 +166,7 @@ export default function Register() {
       openModal("유효성검사", "STAND code는 S로 시작해야 합니다.");
       return false;
     }
-  
+
     showLoading();
     console.log("저장 전 formData 확인 : ", formData);
     await apiService.insertVertiportDetail(formData);
@@ -368,7 +368,7 @@ export default function Register() {
                     </tr>
                   </thead>
                   <tbody>
-                    
+
                     {formData.fatoinfo.map((item, index)=>(
                       <tr key={index}>
                         <td><input type="text" value={item.fatoCode} onChange={(e)=>handleInputChange('fatoCode', e.target.value, index, 'fatoinfo')} /></td>
@@ -377,7 +377,7 @@ export default function Register() {
                         <td><button className="remove" onClick={()=>handleRemoveRow('fato', index)}>-</button></td>
                       </tr>
                     ))}
-                    
+
                   </tbody>
                 </table>
               </td>

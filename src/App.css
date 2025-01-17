@@ -37,6 +37,12 @@
   }
 }
 
+.wrap-app{
+  display: table;
+  width: 100vw;
+  height: 100vh;
+}
+
 .wrap-list{
   padding:20px;
   margin:0px;
@@ -228,24 +234,4 @@
       line-height: 1;
     }
   }
-}
-
-
-/* 오버레이 컨테이너에 대한 기본 스타일 */
-.drone_label {
-  user-select: none;
-  /* 텍스트 드래그 방지 */
-  pointer-events: none;
-  /* 텍스트 포커싱 방지 */
-  font-family: 'Pretendard';
-  text-align: left;
-  /* color: #000; */
-  z-index: 999;
-}
-
-.drone_label .popup-content {
-  display: flex;
-  flex-direction: column;
-  pointer-events: auto;
-  /* 포커싱은 막되, 내부 이벤트 허용 */
 }

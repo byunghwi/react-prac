@@ -9,9 +9,7 @@ export default function List() {
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const { vertiportList, actions: { getVertiportList }} = useVertiportStore();
-  const {
-    actions: { showLoading, hideLoading },
-  } = useModalStore();
+  const { showLoading, hideLoading } = useModalStore();
 
   const handelSearchType = (e) => {
     console.log('handleSearch type...', e.target.value);
@@ -93,12 +91,12 @@ export default function List() {
           </tbody>
         </table>
         {/* <div className='wrap-page'>
-          <Pagenation 
+          <Pagenation
             totalItems={cntTotalList} // Props 전달
             currentPage={pageNo} //v-model 대체
             onPageChange={handlePaginatedLoad} //이벤트 핸들러 바인딩 대체
         </div> */}
-        <div className='wrap-reg'><button onClick={register}>등록</button></div>        
+        <div className='wrap-reg'><button onClick={register}>등록</button></div>
       </div>
     </div>
   );

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15.5" height="15.5" viewBox="0 0 15.5 15.5">
+  <g id="btn_calendar" transform="translate(-281.25 -72.25)">
+    <rect id="사각형_1574" data-name="사각형 1574" width="14" height="12" rx="2" transform="translate(282 75)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <line id="선_390" data-name="선 390" y2="3" transform="translate(286 73)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <line id="선_676" data-name="선 676" y2="3" transform="translate(292 73)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <line id="선_391" data-name="선 391" x2="14" transform="translate(282 80)" fill="none" stroke="#d9d9d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  </g>
+</svg>

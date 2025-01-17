@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <g id="ic_Violation" transform="translate(-1465.5 -130)">
+    <path id="다각형_2" data-name="다각형 2" d="M14.142,0,20,5.858v8.284L14.142,20H5.858L0,14.142V5.858L5.858,0Z" transform="translate(1465.5 130)" fill="#f6a076"/>
+    <g id="slash" transform="translate(1467.5 132)">
+      <circle id="타원_160" data-name="타원 160" cx="6" cy="6" r="6" transform="translate(2 2)" fill="none" stroke="#282b32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <line id="선_562" data-name="선 562" x2="8.484" y2="8.484" transform="translate(3.758 3.758)" fill="none" stroke="#282b32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>

@@ -1,25 +1,28 @@
-.left{
+.left {
   width: 150px;
-  height: calc(100vh - 100px);
-  /* background-color: yellow; */
-  display: table-cell;
+  height: 100vh;
+  background-color: #282b32;
+  display: none;
   border-right: 1px solid #333;
   vertical-align: top;
-  ul{
-    width: 100%;
-    background-color: #666;
-    margin: 0px;
-    padding:0px;
-    li{
+  ul {
+    li {
       list-style: none;
-      padding: 5px;
+      padding: 10px 5px;
       color: #fff;
       cursor: pointer;
+      font-size: 15px;
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
     }
   }
-}
-
-a {
-  text-decoration: none; /* 밑줄 제거 */
-  color: inherit; /* 부모 요소의 색상을 따름 */
+  ul:first-child{
+    height: 40px;
+    border-bottom: 1px solid #999;
+  }
+  &.on{
+    display: table-cell;
+  }
 }

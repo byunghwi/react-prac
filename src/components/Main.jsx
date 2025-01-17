@@ -6,13 +6,13 @@ import useModalStore from '../stores/modal';
 import Modal from './Modal';
 
 export default function Main() {
-  const {isModalOpen, actions: {closeModal}} = useModalStore();
+  const {isModalOpen, closeModal} = useModalStore();
 
   return (
     <>
-      <Header />
       <Menu />
       <div className="right">
+        <Header />
         <Outlet />
       </div>
       <Modal isOpen={isModalOpen} onClose={closeModal}/>
