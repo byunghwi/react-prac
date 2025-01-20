@@ -2,46 +2,38 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/menu.css';
-// import { useUserStore } from "@/stores/user.js";
-// import { useCorridorStore } from "@/stores/corridor.js";
-// import { useVertiportStore } from "@/stores/vertiport.js";
-// import useWaypointStore from "@/stores/waypoint";
+import useUserStore from "../stores/user";
+import useCorridorStore from "../stores/corridor";
+import useVertiportStore from "../stores/vertiport";
+import useWaypointStore from "../stores/waypoint";
 import useAuthStore from '../stores/auth';
 
 
 export default function Menu() {
 
-  // const storeUser = useUserStore();
-  // const storeCorridor = useCorridorStore();
-  // const storeVertiport = useVertiportStore();
-  // const storeWaypoint = useWaypointStore();
-
-  // const { SrchType: userSrchType, SrchValue: userSrchValue, pageNo: userpageNo, cntTotalList: usercntTotalList } = (storeUser);
-  // const { SrchType: cdSrchType, SrchValue: cdSrchValue, pageNo: cdpageNo, cntTotalList: cdcntTotalList } = (storeCorridor);
-  // const { SrchType: vpSrchType, SrchValue: vpSrchValue, pageNo: vppageNo, cntTotalList: vpcntTotalList } = (storeVertiport);
-  // const { SrchValue: wpSrchValue, pageNo: wppageNo, cntTotalList: wpcntTotalList } = (storeWaypoint);
   const { isFoldMenu } = useAuthStore();
 
   useEffect(() => {
     const initValue = () => {
-      // userSrchType.value = "";
-      // userSrchValue.value = "";
-      // userpageNo.value = 1;
-      // usercntTotalList.value = 0;
+      useUserStore.getState().setSrchType("");
+      useUserStore.getState().setSrchValue("");
+      useUserStore.getState().setpageNo(1);
+      useUserStore.getState().cntTotalList = 0;
 
-      // cdSrchType.value = "";
-      // cdSrchValue.value = "";
-      // cdpageNo.value = 1;
-      // cdcntTotalList.value = 0;
+      useCorridorStore.getState().setSrchType("");
+      useCorridorStore.getState().setSrchValue("");
+      useCorridorStore.getState().setpageNo(1);
+      useCorridorStore.getState().cntTotalList = 0;
 
-      // vpSrchType.value = "";
-      // vpSrchValue.value = "";
-      // vppageNo.value = 1;
-      // vpcntTotalList.value = 0;
+      useVertiportStore.getState().setSrchType("");
+      useVertiportStore.getState().setSrchValue("");
+      useVertiportStore.getState().setpageNo(1);
+      useVertiportStore.getState().cntTotalList = 0;
 
-      // wpSrchValue = "";
-      // wppageNo = 1;
-      // wpcntTotalList = 0;
+      useWaypointStore.getState().setSrchType("");
+      useWaypointStore.getState().setSrchValue("");
+      useWaypointStore.getState().setpageNo(1);
+      useWaypointStore.getState().cntTotalList = 0;
     }
     initValue();
   });

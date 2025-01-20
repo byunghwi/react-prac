@@ -23,8 +23,7 @@ export default function Playback() {
   const [endDateTime, setEndDateTime] = useState('2024-12-20 14:00:00');
   const [beforeUnloadHandler, setBeforeUnloadHandler] = useState(null);
   const intervalRef = useRef(null); // interval 저장용 ref
-  const groupedDataRef = useRef({});
-  const nowQueueDataRef = useRef(null);
+  const [nowQueueData, setNowQueueData] = useState(null);
 
   useEffect(()=>{
     console.log('마운트 될때만 실행...?');
@@ -43,7 +42,10 @@ export default function Playback() {
     return () => {
       if(beforeUnloadHandler) window.removeEventListener('beforeunload', beforeUnloadHandler);
       disconnect();
-      if(intervalRef.current) clearInterval(intervalRef.current);
+      if(intervalRef.current) {
+          clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      } 
       console.log('언마운트 될때 실행...?');
     }
   }, []);
@@ -101,8 +103,7 @@ export default function Playback() {
     } else if (type == 'stop') {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
-      nowQueueDataRef.current = null;
-      groupedDataRef.current = {};
+      setNowQueueData(null);
       setOriginqueue();
   
       let params = {
@@ -121,12 +122,6 @@ export default function Playback() {
     }
   };
 
-  const changeValue = (loading, playState, wsMsg) => {
-    setLoading(loading);
-    setPlayState(playState);
-    setIsWSMsgRequired(wsMsg);
-  }
-
   // messageDateTime 기준 그룹화
   const groupByMessageDateTime = useCallback((data) => {
     return data.reduce((acc, eachDrone) => {
@@ -139,67 +134,79 @@ export default function Playback() {
     }, {});
   });
 
-  const startPlayback = useCallback(() => {
-    if (!groupedDataRef.current || Object.keys(groupedDataRef.current).length === 0) {
+  const processQueue = useCallback(() => {
+    if(intervalRef.current) {
+      console.log('기존 처리중 인터벌 있으면 clear');
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (nowQueueData && nowQueueData.groupedData && Object.keys(nowQueueData.groupedData).length > 0) { // nowQueueData에 남은 데이터가 있다면
+      console.log('nowQueueData에 남은 데이터가 있다면 그 지점부터 시작');
+      startPlayback(nowQueueData.groupedData);
       return;
     }
 
+    const data = originQueue.dequeue();
+    if(!data) {
+      console.log('큐에 데이터 없음.');
+      setNowQueueData(null);
+      return;
+    }
+
+    // 최신 값 저장
+    const grouped = groupByMessageDateTime(data);
+    setNowQueueData({originData: data, groupedData: grouped});
+    startPlayback(grouped);
+  }, [originQueue, groupByMessageDateTime, nowQueueData]);
+
+  const startPlayback = useCallback((gd) => {
+    //console.log('1. startPlayback 주기 확인...');
+    if (!gd || Object.keys(gd).length === 0 || intervalRef.current) return;
+
     const baseInterval = 100;
     const intervalTime = baseInterval / replaySpeed;
+    let groupDataByTime = {...gd};
 
     intervalRef.current = setInterval(() => {
-      if (playState === "pause") {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        return;
-      }
-
+      //console.log('2. startPlayback 주기 확인...');
       //현재 시간그룹 데이터 소진 시 새로운 큐데이터 추출
-      if (!groupedDataRef.current || Object.keys(groupedDataRef.current).length === 0) {
-        nowQueueDataRef.current = null;
-        groupedDataRef.current = {};
+      if (!groupDataByTime || Object.keys(groupDataByTime).length === 0) {
+        console.log('현재 시간그룹 데이터 소진 후 processQueue 호출');
         clearInterval(intervalRef.current);
         intervalRef.current = null;
-        processQueue(); // 새로운 큐 데이터를 가져오기 위해 호출
+        setNowQueueData(prev => ({...prev, groupedData: null}));
         return;
       }
 
       // 현재 시간 그룹 데이터 처리
-      const timeKeys = Object.keys(groupedDataRef.current);
-      const currentTimeKey = timeKeys[0];
-      const currentTimeGroup = groupedDataRef.current[currentTimeKey];
-              
+      const timeKeys = Object.keys(groupDataByTime);
+      const currentTimeKey = timeKeys.shift();
+      const currentTimeGroup = groupDataByTime[currentTimeKey];
+
       //화면에 그리기
       currentTimeGroup.forEach((droneData) => {
         pushWsDroneData({ result: droneData });
       });
 
       // 처리한 시간 그룹 제거
-      delete groupedDataRef.current[currentTimeKey];
+      delete groupDataByTime[currentTimeKey];
+      setNowQueueData(prev => ({...prev, groupedData: groupDataByTime}));
     }, intervalTime);
-  }, [playState, replaySpeed]);
+  }, [playState, replaySpeed, processQueue, pushWsDroneData]);
 
-  const processQueue = useCallback(() => {
-    if(intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+  useEffect(() => {
+    if (nowQueueData && nowQueueData.groupedData === null) { // nowQueueData.groupedData가 null이 되면 processQueue 호출
+      console.log('-------- groupedData가 null이되면 processQueue 호출');
+      processQueue();
     }
+  }, [nowQueueData, processQueue]);
 
-    if (!nowQueueDataRef.current) {
-      const data = originQueue.dequeue();
-      if (!data) {
-        console.log("큐에 데이터가 없습니다.");
-        return;
-      }
-
-      // 최신 값 저장
-      groupedDataRef.current = groupByMessageDateTime(data);
-      nowQueueDataRef.current = data;
-      startPlayback()
-    } else {
-      startPlayback();
-    }
-  }, [originQueue, startPlayback]);
+  const changeValue = (loading, playState, wsMsg) => {
+    setLoading(loading);
+    setPlayState(playState);
+    setIsWSMsgRequired(wsMsg);
+  }
 
   const handleModeChange = (e) => {
     setMode(e.target.value);

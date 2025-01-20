@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import useVertiportStore from "../../stores/vertiport";
+import useVertiportStore from '../../stores/vertiport';
 import { useNavigate } from 'react-router-dom';
 import useModalStore from '../../stores/modal';
 
@@ -8,7 +8,7 @@ export default function List() {
   const [srchType, setSrchType] = useState("");
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
-  const { vertiportList, actions: { getVertiportList }} = useVertiportStore();
+  const { vertiportList, getVertiportList } = useVertiportStore();
   const { showLoading, hideLoading } = useModalStore();
 
   const handelSearchType = (e) => {

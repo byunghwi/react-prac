@@ -3,6 +3,7 @@ import AdminMain from '../components/Main';
 import Login from '../components/Login';
 import UserList from '../pages/user/List'
 import UserRegister from '../pages/user/Register'
+import UserModify from '../pages/user/Modify'
 import Auth from '../pages/auth/Auth'
 import AlertLimits from '../pages/AlertLimits'
 import VertiportList from '../pages/vertiport/List'
@@ -19,35 +20,36 @@ function AppRoutes() {
   return (
       <Routes>
         {/* 루트 경로 */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             isAuthenticated ? <AdminMain /> : <Navigate to="/login" replace />
-          } 
+          }
         />
-        
+
         {/* 로그인 페이지 */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             isAuthenticated ? <Navigate to="/" replace /> : <Login />
-          } 
+          }
         />
-          
-        <Route path="/user" element={<AdminMain />}>
+
+        <Route path="/user" element={isAuthenticated ? <AdminMain /> : <Navigate to="/login" replace /> }>
           <Route path="list" element={<UserList />} />
           <Route path="register" element={<UserRegister />} />
+          <Route path="detail/:id" element={<UserModify />} />
           {/*
           <Route path="history" element={<UserHistory />} />
           <Route path="auth" element={<UserAuth />} />
-          <Route path="detail/:id" element={<UserModify />} /> */}
+           */}
         </Route>
 
         <Route path="/auth"  element={<AdminMain />} >
           <Route path="auth" element={<Auth />} />
         </Route>
 
-        
+
         <Route path="/vertiport" element={<AdminMain />}>
           <Route path="list" element={<VertiportList />} />
           <Route path="register" element={<VertiportRegister />} />
@@ -55,11 +57,11 @@ function AppRoutes() {
         {/*    <Route path="detail/:id" element={<VertiportModify />} />
          */}
 
-       
+
         <Route path="/corridor" element={<AdminMain />}>
           <Route path="list" element={<CorridorList />} />
           <Route path="register" element={<CorridorRegister />} />
-          {/*   
+          {/*
           <Route path="detail/:id" element={<CorridorModify />} />
            */}
         </Route>
@@ -71,7 +73,7 @@ function AppRoutes() {
         <Route path="/playback" element={<AdminMain />}>
           <Route path="list" element={<Playback />} />
         </Route>
-        
+
       </Routes>
   );
 }

@@ -4,10 +4,14 @@ import useModalStore from "./modal";
 import Constants from "../utils/constants";
 
 interface WaypointStore {
-  isOpenWaypointPop: boolean,
-  SrchValue: string,
-  pageNo: number,
   cntTotalList: number,
+  pageNo: number,
+  setpageNo: (val:number) => void,
+  SrchType: any,
+  setSrchType: (val?:string) => void,
+  SrchValue: any,
+  setSrchValue: (val?:string) => void,
+  isOpenWaypointPop: boolean,
   waypointList: any,
   allWaypoints: (isPaging?: boolean) => Promise<void>;
   modifyWaypoint: (data?: any) => Promise<void>;
@@ -15,10 +19,14 @@ interface WaypointStore {
 }
 
 const useWaypointStore = create<WaypointStore>((set, get) => ({
+  cntTotalList: 0,
+  pageNo: 1,
+  setpageNo: (val:number) => set({ pageNo: val}),
+  SrchType: '',
+  setSrchType: (val?:string) => set({ SrchType: val}),
+  SrchValue: '',
+  setSrchValue: (val?:string) => set({ SrchValue: val}),
   isOpenWaypointPop: (false),
-  SrchValue: (""),
-  pageNo: (1),
-  cntTotalList: (0),
   waypointList: ([]),
   allWaypoints: async(isPaging) => {
     try {

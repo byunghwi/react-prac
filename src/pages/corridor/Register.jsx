@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import useCorridorStore from "../../stores/corridor";
-import useModalStore from "../../stores/modal";
-import useVertiportStore from "../../stores/vertiport";
-import useMapStore from "../../stores/map";
-import BaseMap from "../../components/BaseMap";
-import UtilFunc from "../../utils/functions";
+import useCorridorStore from '../../stores/corridor';
+import useModalStore from '../../stores/modal';
+import useVertiportStore from '../../stores/vertiport';
+import useMapStore from '../../stores/map'
+import BaseMap from '../../components/BaseMap';
+import UtilFunc from '../../utils/functions';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export default function Register() {
@@ -26,15 +26,15 @@ export default function Register() {
   const { showLoading, hideLoading } = useModalStore();
 
   const {
-    actions: { getVertiportList },
+    getVertiportList,
     vertiportList,
   } = useVertiportStore();
 
   const {
-    actions: { getCorridorList },
+    getCorridorList,
   } = useCorridorStore();
 
-  const { actions: { hideCorridors, hideVertiports, drawCorridors }} = useMapStore();
+  const { hideCorridors, hideVertiports, drawCorridors } = useMapStore();
 
   useEffect(() => {
     async function fetchData() {

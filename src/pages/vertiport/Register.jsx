@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import UtilFunc from "../../utils/functions";
-import useMapStore from "../../stores/map";
+import useMapStore from '../../stores/map';
 import BaseMap from "../../components/BaseMap";
 import apiService from "../../api/apiService";
 import useModalStore from "../../stores/modal";
@@ -11,7 +11,7 @@ export default function Register() {
   const { isLoading, showLoading, hideLoading } = useModalStore();
 
   const {
-    actions: { showVertiport },
+    showVertiport,
   } = useMapStore();
 
   const [formData, setFormData] = useState({

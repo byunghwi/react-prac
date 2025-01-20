@@ -1,204 +1,158 @@
-import { useEffect, useState } from "react";
-import useUserStore from "../../stores/user";
-import useCorridorStore from "../../stores/corridor";
-import useVertiportStore from "../../stores/vertiport";
-import useMapStore from "../../stores/map";
-import BaseMap from "../../components/BaseMap";
-import { useNavigate } from "react-router-dom";
-import "../../styles/register.css"
+import React, { useState, useEffect } from 'react';
+import useUserStore from '../../stores/user';
+import { useNavigate, useParams } from 'react-router-dom';
+import BaseMap from '../../components/BaseMap'
+import useVertiportStore from '../../stores/vertiport';
+import useMapStore from '../../stores/map';
+import useModalStore from '../../stores/modal';
+import useCorridorStore from '../../stores/corridor';
 
 export default function Register() {
-  // 자체 State
-  const [selectedRole, setSelectRole] = useState("");
-  const [selectedAuth, setSelectedAuth] = useState([]);
-  const [tempCorridorList, setTempCorridorList] = useState([]);
-  const [selectedCorridor, setSelectedCorridor] = useState(null);
-
   const navigate = useNavigate();
+  const { showLoading, hideLoading } = useModalStore();
+  const { drawCorridors, hideCorridors, rightTools } = useMapStore();
+  const { getVertiportList, vertiportList } = useVertiportStore();
+  const { getCorridorList, corridorList, corridorDetail, mySector, setcorridorTypes, setcorridorDetail, setmySector } = useCorridorStore();
+  const { getRoleList, getAuthList, getUserDetail, userDetail } = useUserStore();
 
-  const { actions: { drawCorridors, hideCorridors, hideVertiports }} = useMapStore();
-
-  const {
-    roleList,
-    authList,
-    actions: { getRoleList, getAuthList },
-  } = useUserStore();
-
-  const {
-    vertiportList,
-    vertiportDetail,
-    actions: { getVertiportList },
-  } = useVertiportStore();
-
-  const {
-    corridorList,
-    corridorDetail,
-    selectedCorridors,
-    mySector,
-    SrchType,
-    SrchValue,
-    pageNo,
-    cntTotalList,
-    actions: { getCorridorList, setCorridorDetail },
-  } = useCorridorStore();
+  const [roleList, setroleList] = useState([]);
+  const [authList, setauthList] = useState([]);
+  const [tempCorridorList, settempCorridorList] = useState([]);
+  const [selectedAuth, setselectedAuth] = useState([]);
+  const [selectedRole, setselectedRole] = useState("");
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        await getVertiportList(null, {srchType: "", srchValue: ""}); // TODO : searchType, value 상태관리 추가
-        await getCorridorList();
-        await getRoleList();
-        await getAuthList();
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+    const init = async() => {
+      showLoading();
+      setmySector([]);
+      setcorridorDetail("");
+      await getVertiportList();
+      await getCorridorList();
+      setcorridorTypes(['center', 'waypoint', 'name']);
+      let res1 = await getRoleList();
+      setroleList(res1);
+      let res2 = await getAuthList();
+      setauthList(res2);
+      rightTools.removeSector = true;
+      hideLoading();
     }
-    fetchData();
-  }, []);
+    init();
 
-  // selectedCorridor 상태가 변경될 때 실행
+    return () => {
+      rightTools.removeSector = false;
+    }
+
+  },[])
+
   useEffect(() => {
-    if(selectedCorridor === "") {
-      hideVertiports();
-    }
-  }, [selectedCorridor]);
+    if(userDetail.userRole) setselectedRole(userDetail.userRole);
+    if(userDetail.authorityKey) setselectedAuth(JSON.parse(userDetail.authorityKey));
+  },[userDetail])
 
-  const handleRoleChange = (target) => {
-    setSelectRole(target);
-    setSelectedAuth(
-      target !== "" ? JSON.parse(roleList.find((ind) => ind.roleName == target).authorityKey) : []
-    );
-    
-  };
+  const selectRole = (value) => {
+    setselectedAuth(JSON.parse(roleList.find(ind=>ind.roleName===value).authorityKey));
+  }
 
-  const handleCheckVertiport = (e, target) => {
-    if (e.target.checked) {
-      setTempCorridorList([]);
-      setSelectedCorridor("");
-      let filtering = corridorList.filter(
-        (ind) =>
-          ind.departure == target.vertiportId ||
-          ind.destination == target.vertiportId
-      );
-      setTempCorridorList(filtering);
+  const checkVertiport = (checked, item) => {
+    if(checked){
+      settempCorridorList([]);
+      setcorridorDetail("");
+      settempCorridorList(corridorList.filter(ind=>ind.depature===item.vertiportId || ind.destination===item.vertiportId));
       hideCorridors('mySector');
+      // selectVertiport(item.vertiportId)
+    }else{
+      // unSelectVertiport(item.vertiportId)
     }
-  };
+  }
 
-  const handleSelectCorridor = (e) => {
-    let selectCorridor = tempCorridorList.find(ind=>ind.corridorCode==e.target.value);
-    setSelectedCorridor(selectCorridor);
-    drawCorridors([selectCorridor], 'mySector', true);
-  };
+  const selectCorridor = (value) => {
+    setcorridorDetail(value);
+    drawCorridors([tempCorridorList.find(ind=>ind.corridorCode===value)], 'mySector', true)
+  }
 
   const list = () => {
-    navigate("/user/list");
-  };
+    return navigate("/user/list")
+  }
 
   const save = () => {
-    console.log("save...");
-  };
+    showLoading();
+    hideLoading();
+  }
 
   return (
-    <div className="wrap-list">
+      <div className="wrap-list" >
       <div className="title">관제사 섹터 배정</div>
       <div className="wrap-map">
         <div className="wrap-table-cell">
           <table className="">
             <tbody>
-            <tr>
-              <td>ID</td>
-              <td>
-                <input type="text" />
-              </td>
-            </tr>
-            <tr>
-              <td>관제사 명</td>
-              <td><input type="text" /></td>
-            </tr>
-            <tr>
-              <td>ROLE/AUTH</td>
-              <td>
-                <select
-                  value={selectedRole}
-                  onChange={(e) => handleRoleChange(e.target.value)}
-                >
-                  <option value="">== Select ==</option>
-                  {roleList.map((item, index) => (
-                    <option key={index}>{item.roleName}</option>
-                  ))}
-                </select>
-                <ul>
-                  {authList.map((item, index) => (
-                    <li key={index}>
-                      <input
-                        type="checkbox"
-                        value={item.authorityKey}
-                        checked={selectedAuth.includes(item.authorityKey)}
-                        disabled
-                      />
-                      {item.authority}
-                    </li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
-            <tr>
-              <td>VERTIPORT</td>
-              <td>
-                <ul>
-                  {vertiportList.map((vertiport, index) => (
-                    <li key={index}>
-                      <input
-                        type="radio"
-                        name="vertiport"
-                        onClick={(e) => handleCheckVertiport(e, vertiport)}
-                      />
-                      {vertiport.vertiportId}
-                    </li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
-            <tr>
-              <td>CORRIDOR</td>
-              <td>
-                <select
-                  value={selectedCorridor?.corridorCode || ''}
-                  onChange={(e) => handleSelectCorridor(e)}
-                >
-                  <option value="">== Select ==</option>
-                  {tempCorridorList.map((corridor) => (
-                    <option
-                      key={corridor.corridorCode}
-                    >
-                      {corridor.corridorCode}
-                    </option>
-                  ))}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>WAYPOINT</td>
-              <td>
-                <ul>
-                  {mySector.map((item, index)=>(
-                    <li key={index}>
-                      {item.corridor} : {item.prev}-{item.next}
-                    </li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
+              <tr>
+                <td>ID</td><td><input type="text" value={userDetail.loginId || ""} onChange={(e)=>userDetail.loginId=e.target.value}/></td>
+              </tr>
+              <tr>
+                <td>관제사 명</td><td><input type="text" value={userDetail.userName || ""} onChange={(e)=>userDetail.userName=e.target.value}/></td>
+              </tr>
+              <tr>
+                <td>ROLE/AUTH</td>
+                <td>
+                  <select value={selectedRole} onChange={(e)=>selectRole(e.target.value)}>
+                    <option value="">== Select ==</option>
+                    {roleList.map(( item, index )=>(
+                      <option value={item.roleName} key={index}>{ item.roleName }</option>
+                    ))}
+                  </select>
+                  <ul>
+                    {authList.map(( item, index )=>(
+                      <li key={index}>
+                        <input type="checkbox" value={item.authorityKey} checked={selectedAuth.includes(item.authorityKey)} disabled /> {item.authority}
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>VERTIPORT</td>
+                <td>
+                  <ul>
+                    {vertiportList.map(( item, index )=>(
+                      <li key={index}>
+                        <input type="radio" name="vertiport" onClick={(e)=>checkVertiport(e.target.checked,item)}/> { item.vertiportId }
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>CORRIDOR</td>
+                <td>
+                  <select id={corridorDetail} onChange={(e)=>selectCorridor(e.target.value)}>
+                    <option value="">== select ==</option>
+                    {tempCorridorList.map(( item, index )=>(
+                      <option key={index} value={item.corridorCode} >{ item.corridorCode }</option>
+                    ))}
+
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>WAYPOINT</td>
+                <td>
+                  <ul>
+                    {mySector.map(( item, index ) => (
+                      <li key={index}>{ item.corridor } : { item.prev }-{ item.next }</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
         <BaseMap />
       </div>
       <div className="wrap-reg">
-        <button onClick={() => save()}>저장</button>
-        <button onClick={() => list()}>목록</button>
-      </div>
+          <button onClick={save}>저장</button>
+          <button onClick={list}>목록</button>
+        </div>
     </div>
-  );
+    )
 }

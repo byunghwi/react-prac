@@ -7,7 +7,7 @@ export default function Auth() {
   const [isShowAuth, setIsShowAuth] = useState(false);
   const {
     roleList, authList,
-    actions: { getAuthList, getRoleList, modifyRole, saveRole, deleteRole, setRoleList }
+    getAuthList, getRoleList, modifyRole, saveRole, deleteRole, setRoleList
   } = useUserStore();
 
   const viewRole = (role) => {

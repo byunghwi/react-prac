@@ -33,7 +33,7 @@ export default function Header() {
   };
 
   const closeMyInfo = () => {
-    isOpenMyInfo.value = false;
+    isOpenMyInfo = false;
   }
 
 
