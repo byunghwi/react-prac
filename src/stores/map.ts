@@ -60,10 +60,12 @@ const IC_VP_RED = "/assets/icon/ic_vertiport_red.svg"; // 이미지 경로
 const IC_Obstacle = '/assets/icon/ic_obstacle.svg';
 import UtilFunc from '../utils/functions';
 import apiService from '../api/apiService';
-import useCorridorStore from './corridor'
+import useCorridorStore from './corridor';
+import usePlaybackStore from "./playback";
 
 // const IC_WP = '../assets/icon/waypoint.svg';
-import IC_WP from '../assets/icon/waypoint.svg';
+const IC_WP = '/assets/icon/waypoint.svg';
+const IC_VP = '/assets/icon/ic_vertiport_grey.svg';
 
 
 proj4.defs('EPSG:5179', '+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
@@ -96,6 +98,10 @@ interface MapStore {
   lines: any,
   myCorridor: any, // 내가 관리하는 회랑
   hideStyle: any,
+  dragOverlay: any,
+  nowZoom: any,
+  mapRotation: any,
+
   mapEvent: () => void,
   initMap: (map) => void,
   transformCoords: (coords, sourceProj, targetProj) => void,
@@ -116,11 +122,11 @@ interface MapStore {
   setMode: (mode) => void,
   toggleRightTools: (type) => void,
   addFeaturePoint: (list) => void,
+  checkZoom: () => void
 }
 
 const useMapStore = create<MapStore>((set, get) => ({
-  // const storeCorridor = useCorridorStore();
-  // const { corridorList, corridorDetail, mySector, corridorTypes } = storeToRefs(storeCorridor);
+  
   tileNames_en:  [
     "satellite_map",
     "white_map",
@@ -258,7 +264,19 @@ const useMapStore = create<MapStore>((set, get) => ({
       fill: new Fill({ color: `rgba(0,0,0,0)` }),
     }),
   ],
+  dragOverlay: null,
+  nowZoom: 0,
+  mapRotation: 0,
+  checkZoom: () => {
+    if (get().olMap) {
+      set((state) => ({ nowZoom: state.olMap.getView().getZoom() }));
+    } else {
+      console.log('olMap 없을 때 checkZoom..'); // olMap이 없을 경우 로그 출력
+    }
+  },
   mapEvent:  () => {
+    const { wsDroneMarker, wsDroneLabel, wsLabelLine } = usePlaybackStore.getState();
+
     // [1] 마우스 오버
     get().olMap.on('pointermove', function (e) {
       get().olMap.getTarget().style.cursor = 'default'; // 기본 커서 설정
@@ -317,6 +335,41 @@ const useMapStore = create<MapStore>((set, get) => ({
           }
         }
       });
+    });
+
+    // [4] label 드래그 이벤트
+    get().dragOverlay.on('dragstart', function (e) {
+      let overlayGroup = e.overlay.getElement().classList[0];
+      if (overlayGroup == 'drone_label') {
+        console.log(e.overlay.getId(), wsDroneLabel[e.overlay.getId()]);
+        wsDroneLabel[e.overlay.getId()].isDragging = true;
+        wsDroneMarker[e.overlay.getId()].isTarget = false;
+      }
+    })
+    get().dragOverlay.on('dragging', function (e) {
+      let overlayGroup = e.overlay.getElement().classList[0];
+      /* eslint-disable no-empty */
+      if (overlayGroup == 'drone_label') {
+        let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
+        wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
+      } else if (overlayGroup == 'ol-DST' || overlayGroup == 'ol-DST-last') {
+        let linePoint = e.overlay.get('measureLine').getGeometry().getCoordinates()[0];
+        e.overlay.get('measureLine').getGeometry().setCoordinates([linePoint, e.coordinate]);
+      }
+    });
+    get().dragOverlay.on('dragend', function (e) {
+      let overlayGroup = e.overlay.getElement().classList[0];
+      if (overlayGroup == 'drone_label') {
+        let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
+        let sPixel = get().olMap.getPixelFromCoordinate(drone);
+        let ePixel = get().olMap.getPixelFromCoordinate(e.coordinate);
+        let x = ePixel[0] - sPixel[0];
+        let y = ePixel[1] - sPixel[1];
+        wsDroneLabel[e.overlay.getId()].set('x', x)
+        wsDroneLabel[e.overlay.getId()].set('y', y)
+        wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
+        wsDroneLabel[e.overlay.getId()].isDragging = false;
+      }
     });
   },
   initMap: async(map) => {
@@ -434,6 +487,17 @@ const useMapStore = create<MapStore>((set, get) => ({
     get().addLayer('dimLayer', dimLayer)
 
     get().layerGroup[get().tileNames_en[0]].setVisible(true);
+
+    // dragOverlay 설정
+    set((state) => {
+      const overlay = new ol_interaction_DragOverlay({ 
+        overlays: [],
+        centerOnClick: false,});
+      state.olMap.addInteraction(overlay); // 상태 참조 후 즉시 작업 수행
+      return { dragOverlay: overlay }; // 상태 업데이트
+    });
+
+    get().olMap.on('moveend', get().checkZoom)
 
     get().mapEvent();
   },

@@ -269,7 +269,7 @@ const usePlaybackStore = create((set, get) => {
       },
       pushWsDroneData: async (payload) => {
         const { applyFilter, filteredAltitude, wsDroneMarker, wsDroneLabel, wsLabelLine, isShowVector, actions: {styleFunction, createDroneLabel, updateDroneLabel} }  = get();
-        const { olMap, vectorSource, actions: { getLayer } } = useMapStore.getState();
+        const { olMap, vectorSource, getLayer } = useMapStore.getState();
         const { FPLList } = useFPLStore.getState();
         let flightPlanIdentifier = payload.result.flightPlanIdentifier;
         if(flightPlanIdentifier==undefined) flightPlanIdentifier = "test-identifier";
