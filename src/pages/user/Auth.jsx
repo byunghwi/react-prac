@@ -4,7 +4,7 @@ import apiService from '../../api/apiService';
 import "../../styles/auth.css";
 
 export default function UserAuth() {
-  const { showLoading, hideLoading} = useModalStore();
+  const { openModal, showLoading, hideLoading } = useModalStore();
 
   const [roleList, setRoleList] = useState([]);
   const [authList, setAuthList] = useState([]);
@@ -63,19 +63,15 @@ export default function UserAuth() {
 
   const modify = async(item) => {
     if(selectedAuth.length===0){
-      useModalStore.getState().isModalOK = true;
-      useModalStore.getState().modalMsg = "AUTH를 하나 이상 선택해 주세요.";
-      storeModal.openModal();
+      openModal('권한 관리',"AUTH를 하나 이상 선택해 주세요.",true);
       return false;
     }
     if(item.roleName===""){
-      useModalStore.getState().isModalOK = true;
-      useModalStore.getState().modalMsg = "ROLE명을 입력해 주세요.";
-      storeModal.openModal();
+      openModal('권한 관리',"ROLE명을 입력해 주세요.",true);
       return false;
     }
     delete item.isSelect
-    storeModal.showLoading();
+    showLoading();
     item.authorityKey = JSON.stringify(selectedAuth)
     await apiService.modifyRole(item);
     initAuth();
@@ -88,19 +84,15 @@ export default function UserAuth() {
 
   const save = async(item) => {
     if(selectedAuth.length===0){
-      useModalStore.getState().isModalOK = true;
-      useModalStore.getState().modalMsg = "AUTH를 하나 이상 선택해 주세요.";
-      storeModal.openModal();
+      openModal('권한 관리',"AUTH를 하나 이상 선택해 주세요.",true);
       return false;
     }
     if(item.roleName===""){
-      useModalStore.getState().isModalOK = true;
-      useModalStore.getState().modalMsg = "ROLE명을 입력해 주세요.";
-      storeModal.openModal();
+      openModal('권한 관리',"ROLE명을 입력해 주세요.",true);
       return false;
     }
     delete item.isSelect
-    storeModal.showLoading();
+    showLoading();
     item.authorityKey = JSON.stringify(selectedAuth)
     await apiService.saveRole(item);
     initAuth();

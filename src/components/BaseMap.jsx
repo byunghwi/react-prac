@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import useMapStore from '../stores/map';
+import '../styles/register.css'
 
 export default function BaseMap() {
   const { initMap, clearMap } = useMapStore();
@@ -16,8 +17,17 @@ export default function BaseMap() {
   }, []);
 
   return (
-    // <div className="wrap-table-cell" ref={mapRef} tabIndex="0"></div>
-    <div className="wrap-table-cell" ref={mapRef} tabIndex="0"></div>
+    <section id="container">
+      <div className="wrapper">
+        <div className="map_wrapper">
+          <div className="map" ref={mapRef} tabIndex={0}></div>
+          {/* <div class="wrap-right-control">
+            <mapType/>
+            <!-- <button type="button" v-if="rightTools.removeSector" @click="toggleRightTools('removeSector')" name="새로고침">새로고침</button> -->
+          </div> */}
+        </div>
+      </div>
+    </section>
   )
 
 }

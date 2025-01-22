@@ -88,12 +88,12 @@ export default function UserHistory() {
           withPortal
         />
         <div className="search">
-          <select value={SrchType} onChange={(e)=> setSrchType(e.target)}>
+          <select value={SrchType} onChange={(e)=> setSrchType(e.target.value)}>
             <option value="">== Select ==</option>
             <option value="loginId">회원ID</option>
             <option value="userName">이름</option>
           </select>
-          <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target)}/>
+          <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target.value)}/>
           <button onClick={()=>search}>Search</button>
         </div>
       </div>

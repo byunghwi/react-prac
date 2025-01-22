@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import BaseMap from '../../components/BaseMap'
 import useMapStore from '../../stores/map';
 import useModalStore from '../../stores/modal';
@@ -104,7 +104,7 @@ export default function Modify() {
   }
 
   const selectCorridor = (target) => {
-    drawCorridors([tempCorridorList.find(ind=>ind.corridorCode===target)], 'mySector', true)
+    drawCorridors([tempCorridorList.find(ind=>ind.corridorCode===target.value)], 'mySector', true)
   }
 
   const list = () => {
@@ -112,6 +112,7 @@ export default function Modify() {
   }
 
   const save = () => {
+    console.log("userDetail", userDetail)
   }
 
   return (
@@ -122,15 +123,15 @@ export default function Modify() {
         <table className="">
           <tbody>
             <tr>
-              <td>ID</td><td><input type="text" value={userDetail.loginId || ""} onChange={(e)=>userDetail.loginId=e.target}/></td>
+              <td>ID</td><td><input type="text" onChange={(e)=>userDetail.loginId=e.target.value}/></td>
             </tr>
             <tr>
-              <td>관제사 명</td><td><input type="text" value={userDetail.userName || ""} onChange={(e)=>userDetail.userName=e.target}/></td>
+              <td>관제사 명</td><td><input type="text" onChange={(e)=>userDetail.userName=e.target.value}/></td>
             </tr>
             <tr>
               <td>ROLE/AUTH</td>
               <td>
-                <select value={selectedRole} onChange={(e)=>selectRole(e.target)}>
+                <select value={selectedRole} onChange={(e)=>selectRole(e.target.value)}>
                   <option value="">== Select ==</option>
                   {roleList.map(( item, index )=>(
                     <option value={item.roleName} key={index}>{ item.roleName }</option>

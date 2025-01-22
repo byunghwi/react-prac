@@ -565,7 +565,6 @@ const useMapStore = create<MapStore>((set, get) => ({
       ];
       return styles;
     };
-    let showArr = [...useCorridorStore.getState().corridorTypes];
     if(!corridorLayer){
       const defaultStyle = {
         'fill-color': ['get', 'fillColor'],
@@ -616,15 +615,9 @@ const useMapStore = create<MapStore>((set, get) => ({
       // [1] Polygon(폭)
       if(corridorSource.getFeatureById('cdPolygon_'+corridor.corridorCode)){
         let feature = corridorSource.getFeatureById('cdPolygon_'+corridor.corridorCode);
-        if(showArr.includes('width')){ // show 폭
           feature.set('fillColor', `rgba(0,0,0,0)`)
           feature.set('strokeColor', `rgba(115, 118, 127, 1)`)
           feature.set('strokeWidth',1)
-        }else{ // hide
-          feature.set('fillColor','rgba(0, 0, 0, 0)')
-          feature.set('strokeColor','rgba(0, 0, 0, 0)')
-          feature.set('strokeWidth',0)
-        }
       }else{
         arrPolygon?.map((ind: any) => {
           let jsonfeatures = new GeoJSON().readFeatures(ind.stBuffer.value, {
@@ -632,15 +625,9 @@ const useMapStore = create<MapStore>((set, get) => ({
             featureProjection: 'EPSG:5179'
           });
           jsonfeatures.forEach((feature:any) => {
-            if(showArr.includes('width')){ // show 폭
               feature.set('fillColor', `rgba(0,0,0,0)`)
               feature.set('strokeColor', `rgba(115, 118, 127, 1)`)
               feature.set('strokeWidth',1)
-            }else{ // hide
-              feature.set('fillColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeWidth',0)
-            }
             feature.setId('cdPolygon_'+corridor.corridorCode)
             get().lines.corridor[corridor.corridorCode] = feature;
             features.push(feature);
@@ -655,25 +642,13 @@ const useMapStore = create<MapStore>((set, get) => ({
         });
         jsonfeatures.forEach(feature => {
           if(ind.sidStar==="sid"){
-            if(showArr.includes('width')){ // show 폭
               feature.set('fillColor', 'rgba(38, 201, 126, 0.3)')
               feature.set('strokeColor', `rgba(38, 201, 126, 1)`)
               feature.set('strokeWidth', 1)
-            }else{ // hide
-              feature.set('fillColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeWidth',0)
-            }
           }else{
-            if(showArr.includes('width')){ // show 폭
               feature.set('fillColor', 'rgba(235, 78, 2, 0.3)')
               feature.set('strokeColor', `rgba(235, 78, 2, 1)`)
               feature.set('strokeWidth', 1)
-            }else{ // hide
-              feature.set('fillColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeColor','rgba(0, 0, 0, 0)')
-              feature.set('strokeWidth',0)
-            }
           }
           get().lines[ind.sidStar][corridor.corridorCode] = feature;
           features.push(feature);
@@ -721,15 +696,9 @@ const useMapStore = create<MapStore>((set, get) => ({
         //   let transformedPolygonCoords = transformCoords(ind, 'EPSG:4326', 'EPSG:5179');
         //   let intersectPolygon = new Polygon(transformedPolygonCoords);
         //   let intersectFeature = new Feature(intersectPolygon);
-        // if(showArr.includes('width')){ // show 폭
         //   intersectFeature.set('fillColor', `rgba(93, 147, 255, 0.3)`)
         //   intersectFeature.set('strokeColor', `rgba(93, 147, 255, 1)`)
         //   intersectFeature.set('strokeWidth', 1)
-        // }else{ // hide
-        //   intersectFeature.set('fillColor','rgba(0, 0, 0, 0)')
-        //   intersectFeature.set('strokeColor','rgba(0, 0, 0, 0)')
-        //   intersectFeature.set('strokeWidth',0)
-        // }
         //   intersectFeature.setId(corridor.corridorCode+"_myCorridor_"+my_id)
         //   lines.mineunion[corridor.corridorCode+"_myCorridor_"+my_id] = intersectFeature;
         //   features.push(intersectFeature)
@@ -741,15 +710,9 @@ const useMapStore = create<MapStore>((set, get) => ({
         // });
         // let my_id = Object.keys(lines.mineunion).length;
         // jsonfeatures.forEach(feature => {
-          // if(showArr.includes('width')){ // show 폭
         //   feature.set('fillColor', `rgba(93, 147, 255, 0.3)`)
         //   feature.set('strokeColor', `rgba(93, 147, 255, 1)`)
         //   feature.set('strokeWidth', 1)
-          // }else{
-        //   feature.set('fillColor', `rgba(0,0,0,0)`)
-        //   feature.set('strokeColor', `rgba(0,0,0,0)`)
-        //   feature.set('strokeWidth', 0)
-          // }
         //   feature.setId(corridor.corridorCode+"_myCorridor_"+my_id)
         //   lines.mineunion[corridor.corridorCode+"_myCorridor_"+my_id] = feature;
         //   features.push(feature);
@@ -759,16 +722,11 @@ const useMapStore = create<MapStore>((set, get) => ({
       for(var i=0; i<arrCorridor.length-1; i++){
         if(corridorDashSource.getFeatureById('corridor_Center_' + corridor.corridorCode + "_" + i)){
           let segmentLine = corridorDashSource.getFeatureById('corridor_Center_' + corridor.corridorCode + "_" + i);
-          if(showArr.includes('center')){ // show 중심선
             segmentLine.setStyle(centerStyle)
-          }else{ // hide
-            segmentLine.setStyle(get().hideStyle);
-          }
         }else{
           let prev = transform([arrCorridor[i].waypointLon, arrCorridor[i].waypointLat], 'EPSG:4326', 'EPSG:5179')
           let next = transform([arrCorridor[i+1].waypointLon, arrCorridor[i+1].waypointLat], 'EPSG:4326', 'EPSG:5179')
           let segmentLine:any = new Feature({geometry: new LineString([prev,next]), type:"Ani"});
-          if(showArr.includes('center')){ // show 중심선
             segmentLine.setStyle(centerStyle)
             segmentLine.set('st', centerStyle)
             if(group){
@@ -778,10 +736,6 @@ const useMapStore = create<MapStore>((set, get) => ({
               segmentLine.set('prev', arrCorridor[i].waypointCode)
               segmentLine.set('next', arrCorridor[i+1].waypointCode)
             }
-          }else{ // hide
-            segmentLine.setStyle(get().hideStyle);
-            segmentLine.set('st', get().hideStyle)
-          }
           segmentLine.setId('corridor_Center_' + corridor.corridorCode + "_" + i)
           get().lines.corridorCenter[corridor.corridorCode + '_' + i] = segmentLine;
           dashs.push(segmentLine)
@@ -1222,34 +1176,21 @@ const useMapStore = create<MapStore>((set, get) => ({
       // });
       // addLayer('textLayer', textLayer);
     }
-    let showArr = [...useCorridorStore.getState().corridorTypes];
     list.map(ind=>{
       let feature = waypointSource?.getFeatureById(ind.id);
       let newPoint = new Point(transform([ind.lon, ind.lat], 'EPSG:4326', 'EPSG:5179'));
       if(!feature){
-        if(showArr.includes('waypoint')){
           let options: any = { geometry: newPoint, type: ind.styleType};
-          if(showArr.includes('name')){
             if(ind.id) options.id = ind.id;
             if(ind.name) options.nm = ind.name;
-          }
           feature = new Feature(options)
           if(ind.id) feature.setId(ind.id)
           features.push(feature);
-        }
       }else{
-        if(showArr.includes('waypoint')){
-          if(showArr.includes('name')){
             if(ind.id) feature.set('id', ind.id)
             if(ind.name) feature.set('nm', ind.name)
-          }else{
-            feature.set('id', null)
-            feature.set('nm', null)
-          }
+
           feature.setGeometry(newPoint);
-        }else{
-          waypointSource.removeFeature(feature)
-        }
       }
     })
     if(features.length>0) {

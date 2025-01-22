@@ -9,6 +9,7 @@ import UserAuth from '../pages/user/Auth'
 import AlertLimits from '../pages/AlertLimits'
 import VertiportList from '../pages/vertiport/List'
 import VertiportRegister from '../pages/vertiport/Register'
+import VertiportModify from '../pages/vertiport/Modify'
 import CorridorList from '../pages/corridor/List';
 import CorridorRegister from '../pages/corridor/Register';
 import Playback from '../pages/playback/Playback';
@@ -44,13 +45,11 @@ function AppRoutes() {
           <Route path="auth" element={<UserAuth />} />
         </Route>
 
-        <Route path="/vertiport" element={<AdminMain />}>
+        <Route path="/vertiport" element={isAuthenticated ? <AdminMain /> : <Navigate to="/login" replace /> }>
           <Route path="list" element={<VertiportList />} />
           <Route path="register" element={<VertiportRegister />} />
+          <Route path="detail/:id" element={<VertiportModify />} />
         </Route>
-        {/*    <Route path="detail/:id" element={<VertiportModify />} />
-         */}
-
 
         <Route path="/corridor" element={<AdminMain />}>
           <Route path="list" element={<CorridorList />} />

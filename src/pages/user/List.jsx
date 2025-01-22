@@ -9,8 +9,8 @@ import Pagination from '../../components/Pagination';
 export default function List() {
   const navigate = useNavigate();
   const [userList, setUserList] = useState([]);
-  const storeModal = useModalStore();
 
+  const { showLoading, hideLoading } = useModalStore();
   const { SrchType, SrchValue, pageNo, cntTotalList, setpageNo, setcntTotalList, setSrchType, setSrchValue } = useSettingStore();
 
   useEffect(() => {
@@ -18,10 +18,10 @@ export default function List() {
   },[])
 
   const paginatedLoad = async(payload) => {
-    storeModal.showLoading();
+    showLoading();
     setpageNo(payload);
     setUserList(await getUserList());
-    storeModal.hideLoading();
+    hideLoading();
   }
 
   const getUserList = async() => {
@@ -55,12 +55,12 @@ export default function List() {
     <div className="wrap-list" >
       <div className="title">관제 업무 관리</div>
       <div className="wrap-search">
-        <select value={SrchType} onChange={(e)=> setSrchType(e.target)}>
+        <select value={SrchType} onChange={(e)=> setSrchType(e.target.value)}>
           <option value="">== Select ==</option>
           <option value="loginId">회원ID</option>
           <option value="userName">이름</option>
         </select>
-        <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target)}/>
+        <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target.value)}/>
         <button onClick={search}>Search</button>
       </div>
       <div className="wrap-table">
