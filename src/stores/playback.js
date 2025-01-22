@@ -290,7 +290,7 @@ const usePlaybackStore = create((set, get) => {
         // 고도 필터링 (false -> 삭제)
         if(altitudeInRange){
           if(wsDroneMarker[flightPlanIdentifier] ==undefined) {//드론 아이콘 없을시
-            wsDroneMarker[flightPlanIdentifier] = new Feature({
+            const newDroneMarker = new Feature({
               geometry: new Point(newPoint),
               type: payload.result.type,
               callsign:payload.result.callsign,
@@ -298,27 +298,34 @@ const usePlaybackStore = create((set, get) => {
               group:'drone',
               altitudeInRange: altitudeInRange
             });
-            wsDroneMarker[flightPlanIdentifier].setStyle(styleFunction)
-            wsDroneMarker[flightPlanIdentifier].callsign = payload.result.callsign
-            wsDroneMarker[flightPlanIdentifier].heading = payload.result.heading || 0;
-            wsDroneMarker[flightPlanIdentifier].altitude = payload.result.altitude;
-            wsDroneMarker[flightPlanIdentifier].setId(flightPlanIdentifier);
-            wsDroneMarker[flightPlanIdentifier].takeOffTime = payload.result.takeOffTime;
-            wsDroneMarker[flightPlanIdentifier].emergency = {}; //비상상황
-            wsDroneMarker[flightPlanIdentifier].departureAerodrome = payload.result.departureAerodrome;
-            wsDroneMarker[flightPlanIdentifier].destinationAerodrome = payload.result.destinationAerodrome;
-            wsDroneMarker[flightPlanIdentifier].aircraftType = payload.result.aircraftType; // 항공기종
-            wsDroneMarker[flightPlanIdentifier].verVelocityFPM = payload.result.verVelocityFPM; // 항공기 수직속도(고도강하율)
-            wsDroneMarker[flightPlanIdentifier].horVelocityKTS = payload.result.horVelocityKTS; // 항공기 수평속도
-            wsDroneMarker[flightPlanIdentifier].cruisingLevel = 0; // 순항고도(비행계획서로 제출한 고도)
-            wsDroneMarker[flightPlanIdentifier].indicatedAltitude = 0 // FPL 지시고도
+
+            newDroneMarker.setStyle(styleFunction)
+            newDroneMarker.callsign = payload.result.callsign
+            newDroneMarker.heading = payload.result.heading || 0;
+            newDroneMarker.altitude = payload.result.altitude;
+            newDroneMarker.setId(flightPlanIdentifier);
+            newDroneMarker.takeOffTime = payload.result.takeOffTime;
+            newDroneMarker.emergency = {}; //비상상황
+            newDroneMarker.departureAerodrome = payload.result.departureAerodrome;
+            newDroneMarker.destinationAerodrome = payload.result.destinationAerodrome;
+            newDroneMarker.aircraftType = payload.result.aircraftType; // 항공기종
+            newDroneMarker.verVelocityFPM = payload.result.verVelocityFPM; // 항공기 수직속도(고도강하율)
+            newDroneMarker.horVelocityKTS = payload.result.horVelocityKTS; // 항공기 수평속도
+            newDroneMarker.cruisingLevel = 0; // 순항고도(비행계획서로 제출한 고도)
+            newDroneMarker.indicatedAltitude = 0 // FPL 지시고도
             if(FPLInfo.length > 0) {
-              wsDroneMarker[flightPlanIdentifier].submitterInfo = FPLInfo[0].flightPlanSubmitterInfo? FPLInfo[0].flightPlanSubmitterInfo : FPLInfo[0].flightPlanSubmitter; // submitter 정보
-              wsDroneMarker[flightPlanIdentifier].cruisingLevel = FPLInfo[0].cruisingLevel;
-              wsDroneMarker[flightPlanIdentifier].memo = FPLInfo[0].memo || '';
-              wsDroneMarker[flightPlanIdentifier].indicatedAltitude = Number(FPLInfo[0].indicatedAltitude?.split(' ')[0]) || 0; // FPL 지시고도
+              newDroneMarker.submitterInfo = FPLInfo[0].flightPlanSubmitterInfo? FPLInfo[0].flightPlanSubmitterInfo : FPLInfo[0].flightPlanSubmitter; // submitter 정보
+              newDroneMarker.cruisingLevel = FPLInfo[0].cruisingLevel;
+              newDroneMarker.memo = FPLInfo[0].memo || '';
+              newDroneMarker.indicatedAltitude = Number(FPLInfo[0].indicatedAltitude?.split(' ')[0]) || 0; // FPL 지시고도
             }
-            vectorSource.addFeature(wsDroneMarker[flightPlanIdentifier]);
+            vectorSource.addFeature(newDroneMarker);
+            set((state) => ({
+              wsDroneMarker: {
+                ...state.wsDroneMarker,
+                [flightPlanIdentifier]: newDroneMarker
+              }
+            }));
             await createDroneLabel(flightPlanIdentifier);
             if(isShowVector){
               if(wsDroneVector[flightPlanIdentifier]){
@@ -343,19 +350,21 @@ const usePlaybackStore = create((set, get) => {
             //   }
             // }
           }else{
+            const updateDroneMarker = wsDroneMarker[flightPlanIdentifier];
+
             //고도 필터링 업데이트 - 기체, 라벨잇는 선은 Feature
-            wsDroneMarker[flightPlanIdentifier].set('altitudeInRange', altitudeInRange);
-            wsDroneMarker[flightPlanIdentifier].previousAltitude =  wsDroneMarker[flightPlanIdentifier]?.altitude; //직전 고도
+            updateDroneMarker.set('altitudeInRange', altitudeInRange);
+            updateDroneMarker.previousAltitude =  updateDroneMarker?.altitude; //직전 고도
             // 드론 마커 위치 업데이트
-            wsDroneMarker[flightPlanIdentifier].setGeometry(new Point(newPoint));
-            wsDroneMarker[flightPlanIdentifier].heading = payload.result.heading || 0;
-            wsDroneMarker[flightPlanIdentifier].altitude = payload.result.altitude;
-            wsDroneMarker[flightPlanIdentifier].verVelocityFPM = payload.result.verVelocityFPM; // 항공기 수직속도(고도강하율)
-            wsDroneMarker[flightPlanIdentifier].horVelocityKTS = payload.result.horVelocityKTS; // 항공기 수평속도
+            updateDroneMarker.setGeometry(new Point(newPoint));
+            updateDroneMarker.heading = payload.result.heading || 0;
+            updateDroneMarker.altitude = payload.result.altitude;
+            updateDroneMarker.verVelocityFPM = payload.result.verVelocityFPM; // 항공기 수직속도(고도강하율)
+            updateDroneMarker.horVelocityKTS = payload.result.horVelocityKTS; // 항공기 수평속도
             if(FPLInfo?.length > 0) {
-              wsDroneMarker[flightPlanIdentifier].submitterInfo = FPLInfo[0].flightPlanSubmitterInfo? FPLInfo[0].flightPlanSubmitterInfo : FPLInfo[0].flightPlanSubmitter; // submitter 정보
-              wsDroneMarker[flightPlanIdentifier].memo = FPLInfo[0].memo || '';
-              wsDroneMarker[flightPlanIdentifier].indicatedAltitude = Number(FPLInfo[0].indicatedAltitude?.split(' ')[0]) || 0; // FPL 지시고도
+              updateDroneMarker.submitterInfo = FPLInfo[0].flightPlanSubmitterInfo? FPLInfo[0].flightPlanSubmitterInfo : FPLInfo[0].flightPlanSubmitter; // submitter 정보
+              updateDroneMarker.memo = FPLInfo[0].memo || '';
+              updateDroneMarker.indicatedAltitude = Number(FPLInfo[0].indicatedAltitude?.split(' ')[0]) || 0; // FPL 지시고도
             }
     
             // let warningLayer = getLayer('warningLayer');
@@ -461,24 +470,24 @@ const usePlaybackStore = create((set, get) => {
             // }
     
             // wsDroneLine[flightPlanIdentifier].getGeometry().appendCoordinate(newPoint);
-            console.log('pushWsDroneData isDragging...', wsDroneLabel, wsDroneLabel[flightPlanIdentifier]?.isDragging);
-            if(!wsDroneLabel[flightPlanIdentifier]?.isDragging) {
+            if(!get().wsDroneLabel[flightPlanIdentifier]?.isDragging) {
+              const updateDroneLabel = wsDroneLabel[flightPlanIdentifier];
               const pixelDrone = olMap.getPixelFromCoordinate(newPoint);
-              const pixelLabel = olMap.getPixelFromCoordinate(wsDroneLabel[flightPlanIdentifier].getPosition());
-              let xOffset = pixelDrone[0] - pixelLabel[0] + wsDroneLabel[flightPlanIdentifier].get('x');
-              let yOffset = pixelDrone[1] - pixelLabel[1] + wsDroneLabel[flightPlanIdentifier].get('y');
+              const pixelLabel = olMap.getPixelFromCoordinate(updateDroneLabel.getPosition());
+              let xOffset = pixelDrone[0] - pixelLabel[0] + updateDroneLabel.get('x');
+              let yOffset = pixelDrone[1] - pixelLabel[1] + updateDroneLabel.get('y');
               let adjustedCoord = olMap.getCoordinateFromPixel([pixelLabel[0] + xOffset, pixelLabel[1] + yOffset]);
               let adjustedPixelCoord;
     
               //타겟설정된 드론은 실시간 헤딩각도에 따라 위치계산해줘야 함
-              if(wsDroneMarker[flightPlanIdentifier].isTarget == true) {
+              if(get().wsDroneMarker[flightPlanIdentifier].isTarget == true) {
                 let multifly = localStorage.getItem('multiply') || 1;
     
                 // 라벨을 드론의 헤딩 방향으로 배치할 거리 (예: 80픽셀)
                 const distance = 100;
     
                 // 오프셋 각도를 드론의 헤딩 각도에서 180도(반대 방향)로 설정
-                let offsetAngle = (Number(wsDroneMarker[flightPlanIdentifier].heading) + mapRotation + 180) % 360; // 반대 방향의 각도
+                let offsetAngle = (Number(updateDroneMarker.heading) + mapRotation + 180) % 360; // 반대 방향의 각도
     
                 offsetAngle = offsetAngle < 0 ? offsetAngle + 360 : offsetAngle; // 각도를 0 이상으로 조정
                 const offsetAngleRad = offsetAngle * Math.PI / 180; // 라디안으로 변환
@@ -491,13 +500,30 @@ const usePlaybackStore = create((set, get) => {
                 adjustedPixelCoord = [pixelDrone[0] + offsetX, pixelDrone[1] - offsetY]; // Y축 방향 반전
                 adjustedCoord = olMap.getCoordinateFromPixel(adjustedPixelCoord);
     
-                wsDroneLabel[flightPlanIdentifier].setPositioning('center-center');
-                wsDroneLabel[flightPlanIdentifier].set('x', offsetX);
-                wsDroneLabel[flightPlanIdentifier].set('y', offsetY);
+                updateDroneLabel.setPositioning('center-center');
+                updateDroneLabel.set('x', offsetX);
+                updateDroneLabel.set('y', offsetY);
               }
     
-              wsDroneLabel[flightPlanIdentifier].setPosition(adjustedCoord)
-              wsLabelLine[flightPlanIdentifier].getGeometry().setCoordinates([newPoint,adjustedCoord]);
+              updateDroneLabel.setPosition(adjustedCoord);
+              
+              const updateLabelLine = wsLabelLine[flightPlanIdentifier];
+              updateLabelLine.getGeometry().setCoordinates([newPoint,adjustedCoord]);
+
+              set((state) => ({
+                wsDroneMarker: {
+                  ...state.wsDroneMarker,
+                  [flightPlanIdentifier]: updateDroneMarker
+                },
+                wsLabelLine: {
+                  ...state.wsLabelLine,
+                  [flightPlanIdentifier]: updateLabelLine
+                },
+                wsDroneLabel: {
+                  ...state.wsDroneLabel,
+                  [flightPlanIdentifier]: updateDroneLabel
+                }
+              }));
             }
     
             updateDroneLabel(flightPlanIdentifier); // 라벨 내 데이터 갱신
@@ -646,27 +672,28 @@ const usePlaybackStore = create((set, get) => {
         container.appendChild(content);
         document.body.appendChild(container);
     
-        let convertAltitude = UtilFunc.convertKm(wsDroneMarker[flightPlanIdentifier].altitude * 0.0003048); // 단위:FT, 1FT == 0.0003048 KM
-        let convertIndicatedAlt = UtilFunc.convertKm(wsDroneMarker[flightPlanIdentifier].indicatedAltitude * 0.0003048); // 단위:FT, 1FT == 0.0003048 KM
+        const updateDroneMarker = wsDroneMarker[flightPlanIdentifier];
+        let convertAltitude = UtilFunc.convertKm(updateDroneMarker.altitude * 0.0003048); // 단위:FT, 1FT == 0.0003048 KM
+        let convertIndicatedAlt = UtilFunc.convertKm(updateDroneMarker.indicatedAltitude * 0.0003048); // 단위:FT, 1FT == 0.0003048 KM
         let getAltitudeUnit = (altitudeUnit == null ) ? 'FT' : altitudeUnit // 지시고도 단위
     
         content.innerHTML = `
           <div class="label-row1">
-            <span class="vertiport">${wsDroneMarker[flightPlanIdentifier].destinationAerodrome}</span>
+            <span class="vertiport">${updateDroneMarker.destinationAerodrome}</span>
             <!--<span class="landingDirection"></span>-->
-            <span class="warning" style="${wsDroneMarker[flightPlanIdentifier]?.warnColor ? `color: ${wsDroneMarker[flightPlanIdentifier].warnColor};` : ''}">${wsDroneMarker[flightPlanIdentifier]?.warnType || '' }</span>
+            <span class="warning" style="${updateDroneMarker?.warnColor ? `color: ${wsDroneMarker[flightPlanIdentifier].warnColor};` : ''}">${wsDroneMarker[flightPlanIdentifier]?.warnType || '' }</span>
           </div>
           <div class="label-row2">
-            <span class="aircraft-info">${wsDroneMarker[flightPlanIdentifier].callsign} ${wsDroneMarker[flightPlanIdentifier].aircraftType}</span>
+            <span class="aircraft-info">${updateDroneMarker.callsign} ${updateDroneMarker.aircraftType}</span>
           </div>
           <div class="label-row3">
             <span class="altitude">${Math.floor(convertAltitude[getAltitudeUnit])}</span>
             <span class="nowUpDown" style="color: yellow; width: 5%;"></span>
             <span id="indicated-alt-${flightPlanIdentifier}" style="display: inline-block; text-align: center;">${Math.floor(convertIndicatedAlt[getAltitudeUnit])}</span>
-            <span class="horVelocityKTS">${wsDroneMarker[flightPlanIdentifier].horVelocityKTS}</span>
+            <span class="horVelocityKTS">${updateDroneMarker.horVelocityKTS}</span>
           </div>
           <div class="memo-section">
-            <div class="memo-content" id="memo-${flightPlanIdentifier}">${wsDroneMarker[flightPlanIdentifier].memo || ''}</div>
+            <div class="memo-content" id="memo-${flightPlanIdentifier}">${updateDroneMarker.memo || ''}</div>
           </div>
         `;
     
@@ -676,7 +703,7 @@ const usePlaybackStore = create((set, get) => {
         container.style.borderRadius = `${designAircrft.borderRadius}px`;
         container.style.backgroundColor = designAircrft.decontrolBack;
     
-        let originalCoord = wsDroneMarker[flightPlanIdentifier].getGeometry().getCoordinates();
+        let originalCoord = updateDroneMarker.getGeometry().getCoordinates();
         // 라벨의 오프셋을 고려하여 라벨의 실제 위치를 계산
         const pixelCoord = olMap.getPixelFromCoordinate(originalCoord);
         let adjustedPixelCoord, adjustedCoord;
@@ -688,7 +715,7 @@ const usePlaybackStore = create((set, get) => {
           offset = JSON.parse(savedDataJSON).offset;
           positioning = JSON.parse(savedDataJSON).positioning
           if(positioning == 'target') {
-            const heading = wsDroneMarker[flightPlanIdentifier].heading || 0;
+            const heading = updateDroneMarker.heading || 0;
             // 라벨을 드론의 헤딩 방향으로 배치할 거리 (예: 80픽셀)
             const distance = 120;
     
@@ -710,7 +737,13 @@ const usePlaybackStore = create((set, get) => {
             offset[1] = offsetY;
             positioning = 'center-center';
     
-            wsDroneMarker[flightPlanIdentifier].isTarget = true; // 타겟설정된 드론과 드래그로 라벨위치를 옮기는 드론 다르게 계산하기 위함
+            updateDroneMarker.isTarget = true; // 타겟설정된 드론과 드래그로 라벨위치를 옮기는 드론 다르게 계산하기 위함
+            set((state)=>({
+              wsDroneMarker: {
+                ...state.wsDroneMarker,
+                [flightPlanIdentifier] : updateDroneMarker
+              }
+            }));
           } else {
             adjustedPixelCoord = [pixelCoord[0] + offset[0], pixelCoord[1] + offset[1]];
             adjustedCoord = olMap.getCoordinateFromPixel(adjustedPixelCoord);
@@ -721,8 +754,7 @@ const usePlaybackStore = create((set, get) => {
     
           localStorage.setItem('labelPosition', JSON.stringify({ positioning: positioning, offset: offset }))
         }
-    
-        wsDroneLabel[flightPlanIdentifier] = new Overlay({
+        const updateDroneLabel = new Overlay({
           position: adjustedCoord,
           positioning: positioning,
           element: container,
@@ -731,34 +763,50 @@ const usePlaybackStore = create((set, get) => {
           id: flightPlanIdentifier
         });
     
-        olMap.addOverlay(wsDroneLabel[flightPlanIdentifier]);
-        dragOverlay.addOverlay(wsDroneLabel[flightPlanIdentifier]);
-    
-        wsDroneLabel[flightPlanIdentifier].set('x', offset[0]);
-        wsDroneLabel[flightPlanIdentifier].set('y', offset[1]);
-    
+        const updateOlMap = olMap;
+        const updateDragOverlay = dragOverlay;
+        
+        updateOlMap.addOverlay(updateDroneLabel);
+        updateDragOverlay.addOverlay(updateDroneLabel);
+
+        updateDroneLabel.set('x', offset[0]);
+        updateDroneLabel.set('y', offset[1]);
+
         // 드론 피처와 라벨 오버레이를 연결하는 LineString 생성
-        wsLabelLine[flightPlanIdentifier] = new Feature({
+        const updateLabelLine = new Feature({
           geometry: new LineString([originalCoord, adjustedCoord]), // 원래 좌표와 조정된 좌표를 연결
           type: "wsLabelLine",
         });
-    
+        
         //기본 초록색
         let color = designAircrft.acceptColor;  //라벨 글씨 색
         let lineColor = designAircrft.acceptColor; //라벨 라인/외곽선 색
         let backColor = designAircrft.acceptBack;
     
         //통신 타입에 따라 색 변경
-        if(wsDroneMarker[flightPlanIdentifier].get('type') == 'adsb2') {
+        if(updateDroneMarker.get('type') == 'adsb2') {
           color = designAircrft.adsbColor;
           lineColor = designAircrft.adsbColor;
           backColor = designAircrft.acceptBack;
         }
     
+        updateLabelLine.setStyle(styleFunction)
+
+        set((state)=>({
+          wsDroneLabel : {
+            ...state.wsDroneLabel,
+            [flightPlanIdentifier] : updateDroneLabel
+          },
+          wsLabelLine : {
+            ...state.wsLabelLine,
+            [flightPlanIdentifier] : updateLabelLine
+          },
+        }))
+
         changeLabelColor(flightPlanIdentifier, color, lineColor, backColor);
-        wsLabelLine[flightPlanIdentifier].setStyle(styleFunction)
+        
     
-        vectorSource.addFeature(wsLabelLine[flightPlanIdentifier]);
+        vectorSource.addFeature(updateLabelLine);
     
         container.addEventListener('contextmenu', (evt) =>{
           evt.preventDefault();  // 기본 우클릭 메뉴 막기
@@ -766,7 +814,7 @@ const usePlaybackStore = create((set, get) => {
           const existingMenu = document.querySelector('.context-menu');
           if(!existingMenu) {
             const pixel = [evt.clientX, evt.clientY];  // 마우스 클릭 위치에 따라 메뉴 표시
-            openContextMenu(pixel, wsDroneMarker[flightPlanIdentifier]);
+            openContextMenu(pixel, updateDroneMarker);
           }
         });
 

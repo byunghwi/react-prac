@@ -346,17 +346,37 @@ const useMapStore = create<MapStore>((set, get) => ({
     get().dragOverlay.on('dragstart', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
       if (overlayGroup === 'drone_label') {
-        console.log(e.overlay.getId(), wsDroneLabel[e.overlay.getId()]);
-        wsDroneLabel[e.overlay.getId()].isDragging = true;
-        wsDroneMarker[e.overlay.getId()].isTarget = false;
+        const pbState = usePlaybackStore.getState();
+        const fid = e.overlay.getId();
+        const updateDroneLabel = pbState.wsDroneLabel[fid];
+        updateDroneLabel.isDragging = true;
+        updateDroneLabel.isTarget = false;
+
+        usePlaybackStore.setState((state)=> ({
+          wsDroneLabel: {
+            ...state.wsDroneLabel,
+            [fid] : updateDroneLabel
+          }
+        }))
       }
     })
     get().dragOverlay.on('dragging', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
       /* eslint-disable no-empty */
       if (overlayGroup === 'drone_label') {
-        let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
-        wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
+        const pbState = usePlaybackStore.getState();
+        const fid = e.overlay.getId();
+        const drone = pbState.wsDroneMarker[fid].getGeometry().getCoordinates();
+        const updateLabelLine = pbState.wsLabelLine[fid];
+        updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
+
+        usePlaybackStore.setState((state)=> ({
+          wsLabelLine: {
+            ...state.wsLabelLine,
+            [fid] : updateLabelLine
+          }
+        }))
+
       } else if (overlayGroup === 'ol-DST' || overlayGroup === 'ol-DST-last') {
         let linePoint = e.overlay.get('measureLine').getGeometry().getCoordinates()[0];
         e.overlay.get('measureLine').getGeometry().setCoordinates([linePoint, e.coordinate]);
@@ -364,17 +384,32 @@ const useMapStore = create<MapStore>((set, get) => ({
     });
     get().dragOverlay.on('dragend', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
+      const fid = e.overlay.getId();
+      const pbState = usePlaybackStore.getState();
+      const updateDroneLabel = pbState.wsDroneLabel[fid];
+      const updateLabelLine = pbState.wsLabelLine[fid];
       if (overlayGroup === 'drone_label') {
-        let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
+        let drone = pbState.wsDroneMarker[fid].getGeometry().getCoordinates();
         let sPixel = get().olMap.getPixelFromCoordinate(drone);
         let ePixel = get().olMap.getPixelFromCoordinate(e.coordinate);
         let x = ePixel[0] - sPixel[0];
         let y = ePixel[1] - sPixel[1];
-        wsDroneLabel[e.overlay.getId()].set('x', x)
-        wsDroneLabel[e.overlay.getId()].set('y', y)
-        wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
-        wsDroneLabel[e.overlay.getId()].isDragging = false;
-      }
+        updateDroneLabel.set('x', x)
+        updateDroneLabel.set('y', y)
+        updateDroneLabel.isDragging = false;
+        updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
+
+        usePlaybackStore.setState((state)=> ({
+          wsDroneLabel: {
+            ...state.wsDroneLabel,
+            [fid] : updateDroneLabel
+          },
+          wsLabelLine: {
+            ...state.wsLabelLine,
+            [fid] : updateLabelLine
+          }
+        }))
+      };
     });
   },
   initMap: async(map) => {
