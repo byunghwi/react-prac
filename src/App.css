@@ -53,6 +53,9 @@
     padding:10px;
     border: 1px solid #333;
     text-align: right;
+    div:first-child{
+      display: inline-block;
+    }
     input[type=text] {
       margin-left: 10px;
       box-sizing: border-box;
@@ -235,3 +238,68 @@
     }
   }
 }
+
+.pagination{
+  margin: 20px 0px;
+  padding: 0px;
+  ul{
+    text-align: center;
+    padding:0px;
+    margin: 0px;
+    list-style: none; /* 마커를 없애기 */
+    width: 100%;
+  }
+  li{
+    height: 36px;
+    display: inline-block;
+    padding:0px;
+    margin: 0px;
+    button[type=button]{
+      cursor: pointer;
+      padding:0px;
+      margin: 0px;
+      color: #000;
+      width: 36px;
+      height: 36px;
+    }
+    &.on button[type=button]{
+      color: #fff;
+      background-color: #596473;
+    }
+
+  }
+}
+
+/* .react-datepicker__input-container{
+  width:300px;
+} */
+
+.react-datepicker {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.react-datepicker .react-datepicker__day {
+  color: #fff;
+}
+
+.react-datepicker .react-datepicker__day--selected,
+.react-datepicker .react-datepicker__day--keyboard-selected {
+  background-color: #555;
+  color: #fff;
+}
+
+.react-datepicker .react-datepicker__header {
+  background-color: #444;
+  border-bottom: 1px solid #555;
+}
+
+.react-datepicker .react-datepicker__month-container {
+  background-color: #333;
+}
+
+/* .react-datepicker__month-container{
+  float: none;
+  display: inline;
+} */

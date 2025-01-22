@@ -18,7 +18,7 @@ export default function Playback() {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("flow");
   const [replaySpeed, setReplaySpeed] = useState(1);
-  const [fid, setFid] = useState([]);
+  const [fid, setFid] = useState(["7b1ea497-620e-4a56-b544-3656ef6a5535"]);
   const [startDateTime, setStartDateTime] = useState('2024-12-19 14:31:00');
   const [endDateTime, setEndDateTime] = useState('2024-12-20 14:00:00');
   const [beforeUnloadHandler, setBeforeUnloadHandler] = useState(null);

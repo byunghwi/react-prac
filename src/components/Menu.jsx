@@ -46,7 +46,7 @@ export default function Menu() {
       <ul>
         <li><Link to="/user/list">관제 배정 관리</Link></li>
         <li><Link to="/user/history">접속 이력</Link></li>
-        <li><Link to="/auth/auth">권한 관리</Link></li>
+        <li><Link to="/user/auth">권한 관리</Link></li>
       </ul>
       <ul>
         <li><Link to="/vertiport/list">버티포트 관리</Link></li>

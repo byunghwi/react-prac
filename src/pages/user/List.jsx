@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import useUserStore from '../../stores/user';
 import { useNavigate } from 'react-router-dom';
 import useModalStore from '../../stores/modal';
+import Constants from '../../utils/constants';
+import apiService from '../../api/apiService';
+import useSettingStore from '../../stores/setting';
+import Pagination from '../../components/Pagination';
 
 export default function List() {
   const navigate = useNavigate();
   const [userList, setUserList] = useState([]);
-  const { showLoading, hideLoading } = useModalStore();
-  const { SrchType, SrchValue, setpageNo, setSrchType, setSrchValue, getUserList } = useUserStore();
+  const storeModal = useModalStore();
 
-  const paginatedLoad = async (pageNo) => {
-    showLoading();
-    setpageNo(pageNo); // 상태 업데이트
-    const response = await getUserList();
-    setUserList(response);
-    hideLoading();
-  };
+  const { SrchType, SrchValue, pageNo, cntTotalList, setpageNo, setcntTotalList, setSrchType, setSrchValue } = useSettingStore();
 
   useEffect(() => {
     paginatedLoad(1);
   },[])
+
+  const paginatedLoad = async(payload) => {
+    storeModal.showLoading();
+    setpageNo(payload);
+    setUserList(await getUserList());
+    storeModal.hideLoading();
+  }
+
+  const getUserList = async() => {
+    try {
+      let params = {}
+      params.pageNo = pageNo;
+      params.numOfRows = Constants.NumOfRows;
+      params.srchType = SrchType;
+      params.srchValue = SrchValue;
+      let result = await apiService.loadUserList(params);
+      setcntTotalList(result.totalCount);
+      return result.userList;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const adminUserRegister = () => {
     navigate('/user/register');
@@ -37,12 +55,12 @@ export default function List() {
     <div className="wrap-list" >
       <div className="title">관제 업무 관리</div>
       <div className="wrap-search">
-        <select value={SrchType} onChange={(e)=> setSrchType(e.target.value)}>
+        <select value={SrchType} onChange={(e)=> setSrchType(e.target)}>
           <option value="">== Select ==</option>
           <option value="loginId">회원ID</option>
           <option value="userName">이름</option>
         </select>
-        <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target.value)}/>
+        <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target)}/>
         <button onClick={search}>Search</button>
       </div>
       <div className="wrap-table">
@@ -73,7 +91,11 @@ export default function List() {
           </tbody>
         </table>
         <div className="wrap-page">
-          {/* <Pagination :totalItems="cntTotalList" v-model="pageNo" @paginatedLoad="paginatedLoad"/> */}
+          <Pagination
+            totalItems={cntTotalList}
+            pageNo={pageNo}
+            onPaginatedLoad={paginatedLoad}
+          />
         </div>
         <div className="wrap-reg"><button onClick={(e)=>adminUserRegister()}>등록</button></div>
       </div>

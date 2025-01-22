@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import useUserStore from '../../stores/user';
 import { useNavigate, useParams } from 'react-router-dom';
 import BaseMap from '../../components/BaseMap'
-import useVertiportStore from '../../stores/vertiport';
 import useMapStore from '../../stores/map';
 import useModalStore from '../../stores/modal';
-import useCorridorStore from '../../stores/corridor';
+import apiService from '../../api/apiService';
 
 export default function Modify() {
   const navigate = useNavigate();
-  const { showLoading, hideLoading } = useModalStore();
-  const { drawCorridors, hideCorridors, rightTools } = useMapStore();
-  const { getVertiportList, vertiportList } = useVertiportStore();
-  const { getCorridorList, corridorList, corridorDetail, mySector, setcorridorTypes, setcorridorDetail, setmySector } = useCorridorStore();
-  const { getRoleList, getAuthList, getUserDetail, userDetail } = useUserStore();
   const { id } = useParams();
+
+  const { corridorDetail, mySector, rightTools, drawCorridors, hideCorridors, setmySector, setcorridorDetail, setcorridorTypes } = useMapStore();
+  const { showLoading, hideLoading } = useModalStore();
 
   const [roleList, setroleList] = useState([]);
   const [authList, setauthList] = useState([]);
   const [tempCorridorList, settempCorridorList] = useState([]);
   const [selectedAuth, setselectedAuth] = useState([]);
   const [selectedRole, setselectedRole] = useState("");
+  const [userDetail, setuserDetail] = useState([]);
+  const [vertiportList, setvertiportList] = useState([]);
+  const [corridorList, setcorridorList] = useState([]);
 
   useEffect(() => {
     const init = async() => {
@@ -51,15 +50,64 @@ export default function Modify() {
     if(userDetail.authorityKey) setselectedAuth(JSON.parse(userDetail.authorityKey));
   },[userDetail])
 
-  const selectRole = (value) => {
-    setselectedAuth(JSON.parse(roleList.find(ind=>ind.roleName===value).authorityKey));
+  const getCorridorList = async() => {
+    try {
+      let params = {dataType: "JSON"}
+      let result = await apiService.loadCorridorList(params);
+      setcorridorList(result.corridorList);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getVertiportList = async() => {
+    try {
+      let params = {dataType: "JSON"}
+      let result = await apiService.loadVertiportList(params);
+      setvertiportList(result.vertiportList);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getRoleList = async() => {
+    try {
+      let response = await apiService.loadRoleList();
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getAuthList = async() => {
+    try {
+      let response = await apiService.loadAuthList();
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getUserDetail = async(id) => {
+    try {
+      let response = await apiService.loadUserDetail(id);
+      if(response) {
+        setuserDetail(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const selectRole = (target) => {
+    setselectedAuth(JSON.parse(roleList.find(ind=>ind.roleName===target).authorityKey));
   }
 
   const checkVertiport = (checked, item) => {
     if(checked){
       settempCorridorList([]);
       setcorridorDetail("");
-      settempCorridorList(corridorList.filter(ind=>ind.depature===item.vertiportId || ind.destination===item.vertiportId));
+      settempCorridorList(corridorList.filter(ind=>ind.depature===item.vertiportId || ind.destination===item.vertiportId))
       hideCorridors('mySector');
       // selectVertiport(item.vertiportId)
     }else{
@@ -67,9 +115,8 @@ export default function Modify() {
     }
   }
 
-  const selectCorridor = (value) => {
-    setcorridorDetail(value);
-    drawCorridors([tempCorridorList.find(ind=>ind.corridorCode===value)], 'mySector', true)
+  const selectCorridor = (target) => {
+    drawCorridors([tempCorridorList.find(ind=>ind.corridorCode===target)], 'mySector', true)
   }
 
   const list = () => {
@@ -77,8 +124,6 @@ export default function Modify() {
   }
 
   const save = () => {
-    showLoading();
-    hideLoading();
   }
 
   return (
@@ -89,15 +134,15 @@ export default function Modify() {
         <table className="">
           <tbody>
             <tr>
-              <td>ID</td><td><input type="text" value={userDetail.loginId || ""} onChange={(e)=>userDetail.loginId=e.target.value}/></td>
+              <td>ID</td><td><input type="text" value={userDetail.loginId || ""} onChange={(e)=>userDetail.loginId=e.target}/></td>
             </tr>
             <tr>
-              <td>관제사 명</td><td><input type="text" value={userDetail.userName || ""} onChange={(e)=>userDetail.userName=e.target.value}/></td>
+              <td>관제사 명</td><td><input type="text" value={userDetail.userName || ""} onChange={(e)=>userDetail.userName=e.target}/></td>
             </tr>
             <tr>
               <td>ROLE/AUTH</td>
               <td>
-                <select value={selectedRole} onChange={(e)=>selectRole(e.target.value)}>
+                <select value={selectedRole} onChange={(e)=>selectRole(e.target)}>
                   <option value="">== Select ==</option>
                   {roleList.map(( item, index )=>(
                     <option value={item.roleName} key={index}>{ item.roleName }</option>
@@ -127,7 +172,7 @@ export default function Modify() {
             <tr>
               <td>CORRIDOR</td>
               <td>
-                <select id={corridorDetail} onChange={(e)=>selectCorridor(e.target.value)}>
+                <select id={corridorDetail} onChange={(e)=>selectCorridor(e.target)}>
                   <option value="">== select ==</option>
                   {tempCorridorList.map(( item, index )=>(
                     <option key={index} value={item.corridorCode} >{ item.corridorCode }</option>

@@ -3,6 +3,14 @@ import { create } from "zustand";
 import apiService from '../api/apiService';
 
 interface SettingStore {
+  cntTotalList: number,
+  setcntTotalList: (val:number) => void,
+  pageNo: number,
+  setpageNo: (val:number) => void,
+  SrchType: any,
+  setSrchType: (val?:string) => void,
+  SrchValue: any,
+  setSrchValue: (val?:string) => void,
   fontSize: number,
   fontWeight: string, // lighter, bold
   fontStyle: boolean, // normal, oblique
@@ -22,6 +30,15 @@ interface SettingStore {
 }
 
 const useSettingStore = create<SettingStore>((set, get) => ({
+  cntTotalList: 0,
+  setcntTotalList: (val:number) => set({ cntTotalList: val}),
+  pageNo: 1,
+  setpageNo: (val:number) => set({ pageNo: val}),
+  userDetail: {},
+  SrchType: '',
+  setSrchType: (val?:string) => set({ SrchType: val}),
+  SrchValue: '',
+  setSrchValue: (val?:string) => set({ SrchValue: val}),
   fontSize:  (12),
   fontWeight:  ('normal'), // lighter, bold
   fontStyle:  (false), // normal, oblique

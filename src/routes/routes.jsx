@@ -4,7 +4,8 @@ import Login from '../components/Login';
 import UserList from '../pages/user/List'
 import UserRegister from '../pages/user/Register'
 import UserModify from '../pages/user/Modify'
-import Auth from '../pages/auth/Auth'
+import UserHistory from '../pages/user/History'
+import UserAuth from '../pages/user/Auth'
 import AlertLimits from '../pages/AlertLimits'
 import VertiportList from '../pages/vertiport/List'
 import VertiportRegister from '../pages/vertiport/Register'
@@ -39,16 +40,9 @@ function AppRoutes() {
           <Route path="list" element={<UserList />} />
           <Route path="register" element={<UserRegister />} />
           <Route path="detail/:id" element={<UserModify />} />
-          {/*
           <Route path="history" element={<UserHistory />} />
           <Route path="auth" element={<UserAuth />} />
-           */}
         </Route>
-
-        <Route path="/auth"  element={<AdminMain />} >
-          <Route path="auth" element={<Auth />} />
-        </Route>
-
 
         <Route path="/vertiport" element={<AdminMain />}>
           <Route path="list" element={<VertiportList />} />

@@ -1,39 +1,45 @@
-.a-wrap-list{
-  padding:20px;
-  margin:0px;
-  .title{
-    padding:10px;
-  }
-  .a-wrap-table{
+.wrap-table-auth{
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+  padding: 5px;
+  .sc-wrap{
     display: inline-block;
-    width: calc(50% - 10px);
-    vertical-align: top;
-    padding: 5px;
-    .a-sc-wrap{
-      display: inline-block;
-      width: calc(100% - 20px);
-      border: 1px solid #000;
-      ul{
-        list-style: none;
-        padding:0px;
-        li{
-          padding: 5px 0px;
-          .a-sc-btn{
-            display: inline-block;
-            padding-left: 20px;
+    width: calc(100% - 20px);
+    border: 1px solid #000;
+    ul{
+      list-style: none;
+      li{
+        padding: 5px 0px;
+        input[type=radio] {
+          display: inline-block;
+          margin-left: 10px;
+          box-sizing: border-box;
+          padding: 5px;
+          width: 20px;
+          height: 20px;
+          border: 1px solid #666;
+          vertical-align: middle;
+        }
+        input[type=text] {
+          margin-left: 10px;
+          box-sizing: border-box;
+          padding: 5px;
+          width: 200px;
+          height:100%;
+          border: 1px solid #666;
+        }
+        .sc-btn{
+          display: inline-block;
+          padding-left: 20px;
+          button{
+            margin-left: 10px;
+            padding: 5px;
+            color: #fff;
+            border: 1px solid #666;
           }
         }
       }
     }
-  }
-  .a-wrap-reg{
-    margin-top: 20px;
-    text-align: center;
-    button{
-      padding: 5px;
-    }
-  }
-  a-button{
-    cursor: pointer;
   }
 }

@@ -263,6 +263,8 @@ const usePlaybackStore = create((set, get) => {
           delete newWsLabelLine[id];
           delete newWsDroneLabel[id];
           delete newWsDroneVector[id];
+          console.log('[removeWsDronedata] 1: ', newWsDroneMarker, newWsDroneLabel, newWsLabelLine );
+          console.log('[removeWsDronedata] 2:', dragOverlay, olMap.getOverlays());
   
           return { wsDroneMarker: newWsDroneMarker, wsLabelLine: newWsLabelLine, wsDroneLabel: newWsDroneLabel, wsDroneVector: newWsDroneVector };
         })
@@ -288,7 +290,6 @@ const usePlaybackStore = create((set, get) => {
         // 고도 필터링 (false -> 삭제)
         if(altitudeInRange){
           if(wsDroneMarker[flightPlanIdentifier] ==undefined) {//드론 아이콘 없을시
-            //console.log("[ws]", payload)
             wsDroneMarker[flightPlanIdentifier] = new Feature({
               geometry: new Point(newPoint),
               type: payload.result.type,
@@ -460,6 +461,7 @@ const usePlaybackStore = create((set, get) => {
             // }
     
             // wsDroneLine[flightPlanIdentifier].getGeometry().appendCoordinate(newPoint);
+            console.log('pushWsDroneData isDragging...', wsDroneLabel, wsDroneLabel[flightPlanIdentifier]?.isDragging);
             if(!wsDroneLabel[flightPlanIdentifier]?.isDragging) {
               const pixelDrone = olMap.getPixelFromCoordinate(newPoint);
               const pixelLabel = olMap.getPixelFromCoordinate(wsDroneLabel[flightPlanIdentifier].getPosition());
@@ -767,6 +769,9 @@ const usePlaybackStore = create((set, get) => {
             openContextMenu(pixel, wsDroneMarker[flightPlanIdentifier]);
           }
         });
+
+        console.log('[createDroneLabel] 1: ', wsDroneMarker, wsDroneLabel, wsLabelLine);
+        console.log('[createDroneLabel] 2: ', dragOverlay, olMap.getOverlays());
       },
     
       updateDroneLabel: (flightPlanIdentifier) => {

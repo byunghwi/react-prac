@@ -50,6 +50,11 @@ import WebGLPointsLayer from 'ol/layer/WebGLPoints.js';
 import WebGLVectorLayer from 'ol/layer/WebGLVector.js';
 
 import { Fill, Icon, Stroke, Style, Text, Circle as CircleStyle, RegularShape } from 'ol/style.js'
+import UtilFunc from '../utils/functions'
+import apiService from '../api/apiService';
+import useCorridorStore from './corridor';
+import usePlaybackStore from "./playback";
+
 // import IFR_RTK from '@/assets/icon/ic_track_g.svg'
 // import IFR_ADSB from '@/assets/icon/ic_track_w_5.svg'
 const IFR_RTK = "/assets/icon/ic_track_g.svg"; // 이미지 경로
@@ -58,10 +63,6 @@ const IC_BaseStation = '/assets/icon/ic_antenna_2.svg'
 const IC_VP_RED = "/assets/icon/ic_vertiport_red.svg"; // 이미지 경로
 
 const IC_Obstacle = '/assets/icon/ic_obstacle.svg';
-import UtilFunc from '../utils/functions';
-import apiService from '../api/apiService';
-import useCorridorStore from './corridor';
-import usePlaybackStore from "./playback";
 
 // const IC_WP = '../assets/icon/waypoint.svg';
 const IC_WP = '/assets/icon/waypoint.svg';
@@ -101,7 +102,6 @@ interface MapStore {
   dragOverlay: any,
   nowZoom: any,
   mapRotation: any,
-
   mapEvent: () => void,
   initMap: (map) => void,
   transformCoords: (coords, sourceProj, targetProj) => void,
@@ -122,11 +122,16 @@ interface MapStore {
   setMode: (mode) => void,
   toggleRightTools: (type) => void,
   addFeaturePoint: (list) => void,
-  checkZoom: () => void
+  checkZoom: () => void,
+  corridorDetail: any,
+  mySector: any,
+  setcorridorDetail: (val) => void,
+  setmySector: (val) => void,
+  corridorTypes: any,
+  setcorridorTypes: (newValue:any) => void,
 }
 
 const useMapStore = create<MapStore>((set, get) => ({
-  
   tileNames_en:  [
     "satellite_map",
     "white_map",
@@ -340,7 +345,7 @@ const useMapStore = create<MapStore>((set, get) => ({
     // [4] label 드래그 이벤트
     get().dragOverlay.on('dragstart', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
-      if (overlayGroup == 'drone_label') {
+      if (overlayGroup === 'drone_label') {
         console.log(e.overlay.getId(), wsDroneLabel[e.overlay.getId()]);
         wsDroneLabel[e.overlay.getId()].isDragging = true;
         wsDroneMarker[e.overlay.getId()].isTarget = false;
@@ -349,17 +354,17 @@ const useMapStore = create<MapStore>((set, get) => ({
     get().dragOverlay.on('dragging', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
       /* eslint-disable no-empty */
-      if (overlayGroup == 'drone_label') {
+      if (overlayGroup === 'drone_label') {
         let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
         wsLabelLine[e.overlay.getId()].getGeometry().setCoordinates([drone, e.coordinate]);
-      } else if (overlayGroup == 'ol-DST' || overlayGroup == 'ol-DST-last') {
+      } else if (overlayGroup === 'ol-DST' || overlayGroup === 'ol-DST-last') {
         let linePoint = e.overlay.get('measureLine').getGeometry().getCoordinates()[0];
         e.overlay.get('measureLine').getGeometry().setCoordinates([linePoint, e.coordinate]);
       }
     });
     get().dragOverlay.on('dragend', function (e) {
       let overlayGroup = e.overlay.getElement().classList[0];
-      if (overlayGroup == 'drone_label') {
+      if (overlayGroup === 'drone_label') {
         let drone = wsDroneMarker[e.overlay.getId()].getGeometry().getCoordinates();
         let sPixel = get().olMap.getPixelFromCoordinate(drone);
         let ePixel = get().olMap.getPixelFromCoordinate(e.coordinate);
@@ -414,7 +419,7 @@ const useMapStore = create<MapStore>((set, get) => ({
       crossOrigin : 'anonymous'
     };
 
-    for (var i =0; i<get().tileNames_en.length;i++){
+    for (let i =0; i<get().tileNames_en.length;i++){
       get().layerGroup[get().tileNames_en[i]] = new LayerTile({
         visible: false
       });
@@ -452,7 +457,7 @@ const useMapStore = create<MapStore>((set, get) => ({
       // logo:false
       controls: [],
     });
-    for (var i =0; i<get().tileNames_en.length;i++){
+    for (let i =0; i<get().tileNames_en.length;i++){
       get().layerGroup[get().tileNames_en[i]].setSource(new WMTS(Object.assign(
         {},
         wmtEmapOption,
@@ -490,7 +495,7 @@ const useMapStore = create<MapStore>((set, get) => ({
 
     // dragOverlay 설정
     set((state) => {
-      const overlay = new ol_interaction_DragOverlay({ 
+      const overlay = new ol_interaction_DragOverlay({
         overlays: [],
         centerOnClick: false,});
       state.olMap.addInteraction(overlay); // 상태 참조 후 즉시 작업 수행
@@ -1216,6 +1221,12 @@ const useMapStore = create<MapStore>((set, get) => ({
       waypointSource.addFeatures(features);
     }
   },
+  corridorDetail: ({}),
+  mySector: ([]),
+  setcorridorDetail: (val) => set({corridorDetail:val}),
+  setmySector: (val) => set({mySector:val}),
+  corridorTypes: ([]),
+  setcorridorTypes: (newValue:any) => set({corridorTypes:newValue}),
 }))
 
 export default useMapStore;
