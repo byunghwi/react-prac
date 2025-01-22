@@ -8,7 +8,7 @@ export default function List() {
   const [srchType, setSrchType] = useState("");
   const [srchValue, setSrchValue] = useState("");
   const [pageNo, setPageNo] = useState(1);
-  const { corridorList, actions: { getCorridorList }} = useCorridorStore();
+  const { corridorList, getCorridorList } = useCorridorStore();
   const { showLoading, hideLoading } = useModalStore();
 
   const handelSearchType = (e) => {
