@@ -1,61 +1,73 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCorridorStore from '../../stores/corridor'
 import useModalStore from '../../stores/modal';
+import Constants from '../../utils/constants'
+import apiService from '../../api/apiService';
+import useSettingStore from "../../stores/setting";
+import Pagination from '../../components/Pagination';
 
 export default function List() {
   const navigate = useNavigate();
-  const [srchType, setSrchType] = useState("");
-  const [srchValue, setSrchValue] = useState("");
-  const [pageNo, setPageNo] = useState(1);
-  const { corridorList, getCorridorList } = useCorridorStore();
+
   const { showLoading, hideLoading } = useModalStore();
+  const { SrchType, SrchValue, pageNo, cntTotalList, setpageNo, setcntTotalList, setSrchType, setSrchValue } = useSettingStore();
 
-  const handelSearchType = (e) => {
-    setSrchType(e.target.value);
-  }
+  const [corridorList, setcorridorList] = useState([]);
 
-  const handleSearchValue = (e) => {
-    setSrchValue(e.target.value);
-  }
-
-  const handleSearch = () => {
-    paginatedLoad(1)
-  }
+  useEffect(() => {
+    paginatedLoad(pageNo);
+  },[])
 
   const paginatedLoad = async(payload) => {
     showLoading();
-    setPageNo(payload);
-    await getCorridorList(true, {pageNo: pageNo, srchType: srchType, srchValue: srchValue});
+    setpageNo(payload);
+    await getCorridorList(true);
     hideLoading();
+  }
+
+  const getCorridorList = async(isPaging) => {
+    try {
+      let params = {dataType: "JSON"}
+      if(isPaging){
+        params.pageNo = pageNo;
+        params.numOfRows = Constants.NumOfRows;
+      }
+      params.srchType = SrchType;
+      params.srchValue = SrchValue;
+      let result = await apiService.loadCorridorList(params);
+      setcorridorList(result.corridorList);
+      setcntTotalList(result.totalCount);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const modify = async(id) => {
+    navigate('/corridor/detail/'+id);
   }
 
   const register = () => {
     navigate('/corridor/register');
   }
 
-  const modify = (ci) => {
-    navigate('/corridor/detail/'+ci)
+  const search = async() => {
+    paginatedLoad(1);
   }
 
-  useEffect(() => {
-    paginatedLoad(pageNo)
-  }, [])
-
   return (
-    <div className='wrap-list'>
-      <div className='title'>회랑 관리</div>
-      <div className='wrap-search'>
-        <select value={srchType} onChange={handelSearchType}>
+    <div className="wrap-list" >
+      <div className="title">회랑 관리</div>
+      <div className="wrap-search">
+        <select value={SrchType} onChange={(e)=> setSrchType(e.target.value)}>
           <option value="">== Select ==</option>
           <option value="corridorCode">ID</option>
           <option value="corridorName">이름</option>
         </select>
-        <input type="text" value={srchValue} onChange={handleSearchValue} placeholder='Search...'  />
-        <button onClick={handleSearch}>Search</button>
+        <input type="text" value={SrchValue} placeholder="search.." onChange={(e)=> setSrchValue(e.target.value)}/>
+        <button onClick={()=>search()}>Search</button>
       </div>
-      <div className='wrap-table'>
-        <table className=''>
+      <div className="wrap-table">
+        <table className="">
           <thead>
             <tr>
               <th>No</th>
@@ -67,22 +79,28 @@ export default function List() {
             </tr>
           </thead>
           <tbody>
-            {corridorList.map((item, index)=>(
-              <tr key={item.corridorCode}>
-                <td>{index+1}</td>
-                <td>{item.corridorCode}</td>
-                <td>{item.corridorName}</td>
-                <td>{item.width}</td>
-                <td>{item.height}</td>
+            {corridorList.map(( item, index ) => (
+              <tr key={index} >
+                <td>{ index + 1 }</td>
+                <td>{ item.corridorCode }</td>
+                <td>{ item.corridorName }</td>
+                <td>{ item.width }</td>
+                <td>{ item.height }</td>
                 <td><button onClick={()=>modify(item.corridorCode)}>수정</button></td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className='wrap-page'>
+        <div className="wrap-page">
+          <Pagination
+            totalItems={cntTotalList}
+            pageNo={pageNo}
+            onPaginatedLoad={paginatedLoad}
+          />
         </div>
-        <div className='wrap-reg'><button onClick={register}>등록</button></div>
+        <div className="wrap-reg"><button onClick={()=>register}>등록</button></div>
       </div>
     </div>
   )
 }
+

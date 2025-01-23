@@ -8,9 +8,11 @@ interface SettingStore {
   pageNo: number,
   setpageNo: (val:number) => void,
   SrchType: any,
-  setSrchType: (val?:string) => void,
+  setSrchType: (val?:any) => void,
   SrchValue: any,
-  setSrchValue: (val?:string) => void,
+  setSrchValue: (val?:any) => void,
+  sharedData: any,
+  setsharedData: (val?:any) => void,
   fontSize: number,
   fontWeight: string, // lighter, bold
   fontStyle: boolean, // normal, oblique
@@ -36,9 +38,11 @@ const useSettingStore = create<SettingStore>((set, get) => ({
   setpageNo: (val:number) => set({ pageNo: val}),
   userDetail: {},
   SrchType: '',
-  setSrchType: (val?:string) => set({ SrchType: val}),
+  setSrchType: (val:any) => set({ SrchType: val}),
   SrchValue: '',
-  setSrchValue: (val?:string) => set({ SrchValue: val}),
+  setSrchValue: (val:any) => set({ SrchValue: val}),
+  sharedData: null,
+  setsharedData: (val:any) => set({ sharedData: val}),
   fontSize:  (12),
   fontWeight:  ('normal'), // lighter, bold
   fontStyle:  (false), // normal, oblique

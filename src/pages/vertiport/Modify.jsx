@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import useMapStore from '../../stores/map';
-import UtilFunc from "../../utils/functions";
 import useModalStore from '../../stores/modal';
 import BaseMap from "../../components/BaseMap";
 import apiService from '../../api/apiService';
-import '../../styles/register.css'
 
 export default function Modify() {
   const navigate = useNavigate();
@@ -145,24 +143,11 @@ export default function Modify() {
   }
 
   const checkVertiport = (event) => {
-    const regex = /^[0-9.]*$/;
-    if (!regex.test(event.target.value)) {
-      // 올바르지 않은 입력 제거
-      event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+    let lat = Number(vertiportDetail.vertiportLat);
+    let lon = Number(vertiportDetail.vertiportLon);
+    if (event.key!== '.' && lat>0 && lon>0){
+      showVertiport([{id:vertiportDetail.vertiportId, lon:lon, lat:lat}], true)
     }
-    // 점이 여러 번 입력되는 경우 제거
-    const parts = event.target.value.split(".");
-    if (parts.length > 2) {
-      event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
-    }
-    handleChange(event, event.target.id)
-    setTimeout(() => {
-      let lat = Number(vertiportDetail.vertiportLat);
-      let lon = Number(vertiportDetail.vertiportLon);
-      if (event.key!== '.' && lat>0 && lon>0){
-        showVertiport([{id:vertiportDetail.vertiportId, lon:lon, lat:lat}], true)
-      }
-    }, 1);
   }
 
   const list = () => {
@@ -178,14 +163,38 @@ export default function Modify() {
   //   await apiService.deleteVertiport(id);
   // }
 
-  const handleChange = (event, key) => {
+  const handleChange = (event, key, checkFloat) => {
+    if(checkFloat){
+      const regex = /^[0-9.]*$/;
+      if (!regex.test(event.target.value)) {
+        // 올바르지 않은 입력 제거
+        event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+      }
+      // 점이 여러 번 입력되는 경우 제거
+      const parts = event.target.value.split(".");
+      if (parts.length > 2) {
+        event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
+      }
+    }
     setvertiportDetail((prev) => ({
         ...prev,
         [key]: event.target.value,
     }));
   };
 
-  const handleChangeSub = (event, type, key, index) => {
+  const handleChangeSub = (event, type, key, index, checkFloat) => {
+    if(checkFloat){
+      const regex = /^[0-9.]*$/;
+      if (!regex.test(event.target.value)) {
+        // 올바르지 않은 입력 제거
+        event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+      }
+      // 점이 여러 번 입력되는 경우 제거
+      const parts = event.target.value.split(".");
+      if (parts.length > 2) {
+        event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
+      }
+    }
     let cloneObj = vertiportDetail[type];
     cloneObj[index][key] = event.target.value;
     setvertiportDetail((prev) => ({
@@ -193,7 +202,6 @@ export default function Modify() {
         [type]: cloneObj,
     }));
   };
-
 
   return (
     <div className="wrap-list" >
@@ -206,7 +214,7 @@ export default function Modify() {
               <td>ID</td><td><input type="text" value={vertiportDetail.vertiportId || ""} readOnly /></td>
             </tr>
             <tr>
-              <td>이름</td><td><input type="text" value={vertiportDetail.vertiportName || ""} onChange={(e)=>checkVertiport(e,'vertiportName')} /></td>
+              <td>이름</td><td><input type="text" value={vertiportDetail.vertiportName || ""} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportName')} /></td>
             </tr>
             <tr>
               <td>종류</td><td><input type="text" value={vertiportDetail.vertiportKind || ""} onChange={(e)=>handleChange(e,'vertiportKind')} /></td>
@@ -215,7 +223,7 @@ export default function Modify() {
               <td>CALLSIGN</td><td><input type="text" value={vertiportDetail.vertiportCallsign || ""} onChange={(e)=>handleChange(e,'vertiportCallsign')} /></td>
             </tr>
             <tr>
-              <td>통신채널</td><td><input type="text" value={vertiportDetail.vertiportChannel || ""} onKeyDown={UtilFunc.handleKeydownNumber} onChange={(e)=>handleChange(e,'vertiportChannel')} /></td>
+              <td>통신채널</td><td><input type="text" value={vertiportDetail.vertiportChannel || ""} onChange={(e)=>handleChange(e,'vertiportChannel', true)} /></td>
             </tr>
             <tr>
               <td>이착륙 방향</td>
@@ -240,11 +248,11 @@ export default function Modify() {
           <table className="mini">
             <tbody>
             <tr>
-              <td>주파수</td><td><input type="text" value={vertiportDetail.vertiportFrequency || ""} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportFrequency')} /></td>
-              <td>대역폭</td><td><input type="text" value={vertiportDetail.vertiportBandwidth || ""} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportBandwidth')} /></td>
+              <td>주파수</td><td><input type="text" value={vertiportDetail.vertiportFrequency || ""} onChange={(e)=>handleChange(e,'vertiportFrequency', true)} /></td>
+              <td>대역폭</td><td><input type="text" value={vertiportDetail.vertiportBandwidth || ""} onChange={(e)=>handleChange(e,'vertiportBandwidth', true)} /></td>
             </tr>
             <tr>
-              <td>높이</td><td><input type="text" value={vertiportDetail.vertiportHeight || ""} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportHeight')} /></td>
+              <td>높이</td><td><input type="text" value={vertiportDetail.vertiportHeight || ""} onChange={(e)=>handleChange(e,'vertiportHeight', true)} /></td>
               <td>높이기준</td><td>
                 <select value={vertiportDetail.vertiportHeightCriteria} onChange={(e)=>handleChange(e,'vertiportHeightCriteria')}>
                   <option value="AGL">AGL(지표면기준)</option>
@@ -254,8 +262,8 @@ export default function Modify() {
               </td>
             </tr>
             <tr>
-              <td>위도</td><td><input type="text" value={vertiportDetail.vertiportLat || ""} onChange={(e)=>checkVertiport(e,'vertiportLat')} /></td>
-              <td>경도</td><td><input type="text" id="vertiportLon" value={vertiportDetail.vertiportLon || ""} onChange={(e)=>checkVertiport(e,'vertiportLon')}  /></td>
+              <td>위도</td><td><input type="text" value={vertiportDetail.vertiportLat || ""} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportLat', true)} /></td>
+              <td>경도</td><td><input type="text" id="vertiportLon" value={vertiportDetail.vertiportLon || ""} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportLon', true)} /></td>
             </tr>
             </tbody>
           </table>
@@ -280,8 +288,8 @@ export default function Modify() {
                     {vertiportDetail?.fatoinfo?.map(( item, index ) => (
                       <tr key={index}>
                         <td><input type="text" value={item.fatoCode} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoCode', index)} /></td>
-                        <td><input type="text" value={item.fatoLat} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLat', index)} /></td>
-                        <td><input type="text" value={item.fatoLon} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLon', index)} /></td>
+                        <td><input type="text" value={item.fatoLat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLat', index, true)} /></td>
+                        <td><input type="text" value={item.fatoLon} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLon', index, true)} /></td>
                         <td><button className="remove" onClick={()=>removeRow('fato',index)}>-</button></td>
                       </tr>
                     ))}
@@ -302,8 +310,8 @@ export default function Modify() {
                     {vertiportDetail?.standinfo?.map(( item, index ) => (
                       <tr key={index}>
                         <td><input type="text" value={item.standCode} onChange={(e)=>handleChangeSub(e,'standinfo', 'standCode', index)} /></td>
-                      <td><input type="text" value={item.standLat} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLat', index)} /></td>
-                      <td><input type="text" value={item.standLon} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLon', index)} /></td>
+                      <td><input type="text" value={item.standLat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLat', index, true)} /></td>
+                      <td><input type="text" value={item.standLon} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLon', index, true)} /></td>
                       <td><button className="remove" onClick={()=>removeRow('stand',index)}>-</button></td>
                       </tr>
                     ))}

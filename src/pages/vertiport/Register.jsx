@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import UtilFunc from "../../utils/functions";
 import useMapStore from '../../stores/map';
@@ -16,10 +16,10 @@ export default function Register() {
     "vertiportId": "",
     "vertiportKind": "",
     "vertiportCallsign": "",
-    "vertiportFrequency": null,
-    "vertiportBandwidth": null,
-    "vertiportChannel": null,
-    "vertiportHeight": null,
+    "vertiportFrequency": 0,
+    "vertiportBandwidth": 0,
+    "vertiportChannel": 0,
+    "vertiportHeight": 0,
     "vertiportHeightCriteria": "AGL",
     "vertiportDepDirection": "",
     "vertiportDesDirection": "",
@@ -33,25 +33,16 @@ export default function Register() {
   let fatoEl = useRef(null);
 
   const checkVertiport = (event) => {
-    const regex = /^[0-9.]*$/;
-    if (!regex.test(event.target.value)) {
-      // 올바르지 않은 입력 제거
-      event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+    let lat = Number(formData.vertiportLat);
+    let lon = Number(formData.vertiportLon);
+    if (event.key !== "." && lat > 0 && lon > 0) {
+      showVertiport(
+        [{ id: formData.vertiportId, lon: lon, lat: lat }],
+        true,
+        true
+      );
     }
-    // 점이 여러 번 입력되는 경우 제거
-    const parts = event.target.value.split(".");
-    if (parts.length > 2) {
-      event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
-    }
-    handleChange(event, event.target.id)
-    setTimeout(() => {
-      let lat = Number(vertiportDetail.vertiportLat);
-      let lon = Number(vertiportDetail.vertiportLon);
-      if (event.key!== '.' && lat>0 && lon>0){
-        showVertiport([{id:vertiportDetail.vertiportId, lon:lon, lat:lat}], true)
-      }
-    }, 1);
-  }
+  };
 
   const list = () => {
     navigate('/vertiport/list');
@@ -157,14 +148,38 @@ export default function Register() {
     }
   }
 
-  const handleChange = (event, key) => {
+  const handleChange = (event, key, checkFloat) => {
+    if(checkFloat){
+      const regex = /^[0-9.]*$/;
+      if (!regex.test(event.target.value)) {
+        // 올바르지 않은 입력 제거
+        event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+      }
+      // 점이 여러 번 입력되는 경우 제거
+      const parts = event.target.value.split(".");
+      if (parts.length > 2) {
+        event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
+      }
+    }
     setformData((prev) => ({
         ...prev,
         [key]: event.target.value,
     }));
   };
 
-  const handleChangeSub = (event, type, key, index) => {
+  const handleChangeSub = (event, type, key, index, checkFloat) => {
+    if(checkFloat){
+      const regex = /^[0-9.]*$/;
+      if (!regex.test(event.target.value)) {
+        // 올바르지 않은 입력 제거
+        event.target.value = event.target.value.replace(/[^0-9.]/g, "");
+      }
+      // 점이 여러 번 입력되는 경우 제거
+      const parts = event.target.value.split(".");
+      if (parts.length > 2) {
+        event.target.value = parts[0] + "." + parts.slice(1).join("").replace(/\./g, "");
+      }
+    }
     let cloneObj = formData[type];
     cloneObj[index][key] = event.target.value;
     setformData((prev) => ({
@@ -181,10 +196,10 @@ export default function Register() {
           <table className="">
           <tbody>
             <tr>
-              <td>ID</td><td><input type="text" value={formData.vertiportId} onChange={(e)=>checkVertiport(e,'vertiportId')} /></td>
+              <td>ID</td><td><input type="text" value={formData.vertiportId} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportId')} /></td>
             </tr>
             <tr>
-              <td>이름</td><td><input type="text" value={formData.vertiportName} onChange={(e)=>checkVertiport(e,'vertiportName')} /></td>
+              <td>이름</td><td><input type="text" value={formData.vertiportName} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportName')} /></td>
             </tr>
             <tr>
               <td>종류</td><td><input type="text" value={formData.vertiportKind} onChange={(e)=>handleChange(e,'vertiportKind')} /></td>
@@ -193,7 +208,7 @@ export default function Register() {
               <td>CALLSIGN</td><td><input type="text" value={formData.vertiportCallsign} onChange={(e)=>handleChange(e,'vertiportCallsign')} /></td>
             </tr>
             <tr>
-              <td>통신채널</td><td><input type="text" value={formData.vertiportChannel} onKeyDown={UtilFunc.handleKeydownNumber} onChange={(e)=>handleChange(e,'vertiportChannel')} /></td>
+              <td>통신채널</td><td><input type="text" value={formData.vertiportChannel} onChange={(e)=>handleChange(e,'vertiportChannel', true)} /></td>
             </tr>
             <tr>
               <td>주소</td><td><input type="text" value={formData.vertiportAddress} onChange={(e)=>handleChange(e,'vertiportAddress')} /></td>
@@ -203,11 +218,11 @@ export default function Register() {
           <table className="mini">
           <tbody>
             <tr>
-              <td>주파수</td><td><input type="text" value={formData.vertiportFrequency} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportFrequency')} /></td>
-              <td>대역폭</td><td><input type="text" value={formData.vertiportBandwidth} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportBandwidth')} /></td>
+              <td>주파수</td><td><input type="text" value={formData.vertiportFrequency} onChange={(e)=>handleChange(e,'vertiportFrequency', true)} /></td>
+              <td>대역폭</td><td><input type="text" value={formData.vertiportBandwidth} onChange={(e)=>handleChange(e,'vertiportBandwidth', true)} /></td>
             </tr>
             <tr>
-              <td>높이</td><td><input type="text" value={formData.vertiportHeight} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChange(e,'vertiportHeight')} /></td>
+              <td>높이</td><td><input type="text" value={formData.vertiportHeight} onChange={(e)=>handleChange(e,'vertiportHeight', true)} /></td>
               <td>높이기준</td>
               <td>
                 <select value={formData.vertiportHeightCriteria} onChange={(e)=>handleChange(e,'vertiportHeightCriteria')}>
@@ -218,8 +233,8 @@ export default function Register() {
               </td>
             </tr>
             <tr>
-              <td>위도</td><td><input type="text" value={formData.vertiportLat} onChange={(e)=>checkVertiport(e,'vertiportLat')} /></td>
-              <td>경도</td><td><input type="text" value={formData.vertiportLon} onChange={(e)=>checkVertiport(e,'vertiportLon')} /></td>
+              <td>위도</td><td><input type="text" value={formData.vertiportLat} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportLat', true)} /></td>
+              <td>경도</td><td><input type="text" value={formData.vertiportLon} onKeyUp={checkVertiport} onChange={(e)=>handleChange(e,'vertiportLon', true)} /></td>
             </tr>
             </tbody>
           </table>
@@ -244,8 +259,8 @@ export default function Register() {
                     {formData.fatoinfo?.map(( item, index ) => (
                       <tr key={index}>
                         <td><input type="text" value={item.fatoCode} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoCode', index)} /></td>
-                        <td><input type="text" value={item.fatoLat} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLat', index)} /></td>
-                        <td><input type="text" value={item.fatoLon} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLon', index)} /></td>
+                        <td><input type="text" value={item.fatoLat} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLat', index, true)} /></td>
+                        <td><input type="text" value={item.fatoLon} onChange={(e)=>handleChangeSub(e,'fatoinfo', 'fatoLon', index, true)} /></td>
                         <td><button className="remove" onClick={()=>removeRow('fato',index)}>-</button></td>
                       </tr>
                     ))}
@@ -266,8 +281,8 @@ export default function Register() {
                     {formData.standinfo?.map(( item, index ) => (
                       <tr key={index}>
                         <td><input type="text" value={item.standCode} onChange={(e)=>handleChangeSub(e,'standinfo', 'standCode', index)} /></td>
-                        <td><input type="text" value={item.standLat} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLat', index)} /></td>
-                        <td><input type="text" value={item.standLon} onKeyDown={UtilFunc.handleKeydownFloat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLon', index)} /></td>
+                        <td><input type="text" value={item.standLat} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLat', index, true)} /></td>
+                        <td><input type="text" value={item.standLon} onChange={(e)=>handleChangeSub(e,'standinfo', 'standLon', index, true)} /></td>
                         <td><button className="remove" onClick={()=>removeRow('stand',index)}>-</button></td>
                       </tr>
                     ))}

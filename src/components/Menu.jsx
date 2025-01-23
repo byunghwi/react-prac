@@ -2,41 +2,25 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/menu.css';
-import useUserStore from "../stores/user";
-import useCorridorStore from "../stores/corridor";
-import useVertiportStore from "../stores/vertiport";
-import useWaypointStore from "../stores/waypoint";
+import useSettingStore from "../stores/setting";
 import useAuthStore from '../stores/auth';
-
 
 export default function Menu() {
 
   const { isFoldMenu } = useAuthStore();
+  const { setSrchType, setSrchValue, setpageNo, setcntTotalList, setsharedData } = useSettingStore();
 
   useEffect(() => {
-    const initValue = () => {
-      useUserStore.getState().setSrchType("");
-      useUserStore.getState().setSrchValue("");
-      useUserStore.getState().setpageNo(1);
-      useUserStore.getState().cntTotalList = 0;
-
-      useCorridorStore.getState().setSrchType("");
-      useCorridorStore.getState().setSrchValue("");
-      useCorridorStore.getState().setpageNo(1);
-      useCorridorStore.getState().cntTotalList = 0;
-
-      useVertiportStore.getState().setSrchType("");
-      useVertiportStore.getState().setSrchValue("");
-      useVertiportStore.getState().setpageNo(1);
-      useVertiportStore.getState().cntTotalList = 0;
-
-      useWaypointStore.getState().setSrchType("");
-      useWaypointStore.getState().setSrchValue("");
-      useWaypointStore.getState().setpageNo(1);
-      useWaypointStore.getState().cntTotalList = 0;
-    }
     initValue();
-  });
+  },[]);
+
+  const initValue = () => {
+    setSrchType("");
+    setSrchValue("");
+    setpageNo(1);
+    setcntTotalList(0);
+    setsharedData(null);
+  }
 
   return (
     <div className={`left ${!isFoldMenu ? 'on' : ''}`}>
@@ -53,7 +37,7 @@ export default function Menu() {
         <li><Link to="/corridor/list">회랑 관리</Link></li>
         <li><Link to="/sidcvfp/list">SID / CVFP 관리</Link></li>
         <li><Link to="/waypoint/list">waypoint 관리</Link></li>
-        <li><Link to="/alertLimits">경보 임계치 설정</Link></li>
+        <li><Link to="/alert/Limits">경보 임계치 설정</Link></li>
         <li><Link to="/notam/list">NOTAM</Link></li>
         </ul>
       <ul>

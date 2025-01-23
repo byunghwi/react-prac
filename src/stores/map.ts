@@ -54,19 +54,13 @@ import UtilFunc from '../utils/functions'
 import apiService from '../api/apiService';
 import useCorridorStore from './corridor';
 import usePlaybackStore from "./playback";
-
-// import IFR_RTK from '@/assets/icon/ic_track_g.svg'
-// import IFR_ADSB from '@/assets/icon/ic_track_w_5.svg'
-const IFR_RTK = "/assets/icon/ic_track_g.svg"; // 이미지 경로
-const IFR_ADSB ='/assets/icon/ic_track_w_5.svg'
-const IC_BaseStation = '/assets/icon/ic_antenna_2.svg'
-const IC_VP_RED = "/assets/icon/ic_vertiport_red.svg"; // 이미지 경로
-
-const IC_Obstacle = '/assets/icon/ic_obstacle.svg';
-
-// const IC_WP = '../assets/icon/waypoint.svg';
-const IC_WP = '/assets/icon/waypoint.svg';
-const IC_VP = '/assets/icon/ic_vertiport_grey.svg';
+import IC_WP from '../assets/icon/waypoint.svg'
+import IC_VP from '../assets/icon/ic_vertiport_grey.svg';
+import IFR_RTK from '../assets/icon/ic_track_g.svg'
+import IFR_ADSB from '../assets/icon/ic_track_w_5.svg'
+import IC_BaseStation from '../assets/icon/ic_antenna_2.svg'
+import IC_VP_RED from "../assets/icon/ic_vertiport_red.svg"; // 이미지 경로
+import IC_Obstacle from '../assets/icon/ic_obstacle.svg';
 
 
 proj4.defs('EPSG:5179', '+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
@@ -851,9 +845,9 @@ const useMapStore = create<MapStore>((set, get) => ({
     if(vertiports.length > 0) {
       vertiports.forEach((ind) => {
         let vertiport = vertiportSource.getFeatureById(ind.id);
+        let coord = transform([ind.lon, ind.lat], 'EPSG:4326', 'EPSG:5179')
+        let newPoint = new Point(coord)
         if(!vertiport){
-            let coord = transform([ind.lon, ind.lat], 'EPSG:4326', 'EPSG:5179')
-            let newPoint = new Point(coord)
             let feature = new Feature({
               geometry: newPoint,
               id: ind.id,
@@ -864,7 +858,7 @@ const useMapStore = create<MapStore>((set, get) => ({
             feature.setId(ind.id)
             features.push(feature)
         }else{
-          vertiportSource.removeFeature(vertiport);
+          vertiport.setGeometry(newPoint)
           features.push(vertiport)
         }
       })

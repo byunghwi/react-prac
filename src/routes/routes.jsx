@@ -6,12 +6,13 @@ import UserRegister from '../pages/user/Register'
 import UserModify from '../pages/user/Modify'
 import UserHistory from '../pages/user/History'
 import UserAuth from '../pages/user/Auth'
-import AlertLimits from '../pages/AlertLimits'
+import AlertLimits from '../pages/alert/Limits'
 import VertiportList from '../pages/vertiport/List'
 import VertiportRegister from '../pages/vertiport/Register'
 import VertiportModify from '../pages/vertiport/Modify'
 import CorridorList from '../pages/corridor/List';
 import CorridorRegister from '../pages/corridor/Register';
+import CorridorModify from '../pages/corridor/Modify';
 import Playback from '../pages/playback/Playback';
 
 function AppRoutes() {
@@ -51,16 +52,14 @@ function AppRoutes() {
           <Route path="detail/:id" element={<VertiportModify />} />
         </Route>
 
-        <Route path="/corridor" element={<AdminMain />}>
+        <Route path="/corridor" element={isAuthenticated ? <AdminMain /> : <Navigate to="/login" replace /> }>
           <Route path="list" element={<CorridorList />} />
           <Route path="register" element={<CorridorRegister />} />
-          {/*
           <Route path="detail/:id" element={<CorridorModify />} />
-           */}
         </Route>
 
-        <Route path="/alertLimits" element={<AdminMain />}>
-          <Route path="" element={<AlertLimits />} />
+        <Route path="/alert" element={isAuthenticated ? <AdminMain /> : <Navigate to="/login" replace /> }>
+          <Route path="Limits" element={<AlertLimits />} />
         </Route>
 
         <Route path="/playback" element={<AdminMain />}>

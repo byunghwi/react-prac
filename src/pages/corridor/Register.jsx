@@ -175,14 +175,14 @@ export default function Register() {
               <tr>
                 <td>출발 버티포트</td>
                 <td>
-                  <select
+                  {/* <select
                     value={formData.departure?.vertiportId || ""}
                     onChange={(e)=>{
                       const selectedVertiport = vertiportList.find(
                         (item) => item.vertiportId === e.target.value
                       );
                       handleChangeVertiport("departure", selectedVertiport);
-                    }}
+                    }
                   >
                     <option value="">== Select ==</option>
                     {vertiportList.map((item, index) => (
@@ -190,20 +190,20 @@ export default function Register() {
                         {item.vertiportId}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
                 </td>
               </tr>
               <tr>
                 <td>도착 버티포드</td>
                 <td>
-                  <select
+                  {/* <select
                     value={formData.destination?.vertiportId || ""}
                     onChange={(e)=>{
                       const selectedVertiport = vertiportList.find(
                         (item) => item.vertiportId === e.target.value
                       );
                       handleChangeVertiport("destination", selectedVertiport);
-                    }}
+                    }
                   >
                     <option value="">== Select ==</option>
                     {vertiportList.map((item, index) => (
@@ -211,7 +211,7 @@ export default function Register() {
                         {item.vertiportId}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
                 </td>
               </tr>
             </tbody>
