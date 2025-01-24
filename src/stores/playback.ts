@@ -1,19 +1,20 @@
 import { create } from "zustand";
 import UtilFunc from "../utils/functions"
 import Queue from "../utils/queue"
-import useMapStore from "../stores/map";
-import useFPLStore from "../stores/FPL"
-import useSettingStore from "../stores/setting"
+import useMapStore from "./map";
+import useFPLStore from "./FPL"
+import useSettingStore from "./setting"
 import apiService from "../api/apiService"
 import {get as getProjection, fromLonLat, transform, toLonLat} from 'ol/proj.js';
 import Feature from 'ol/Feature.js'
 import { Point, LineString, Polygon } from 'ol/geom'
-import Overlay from 'ol/Overlay.js';
+import Overlay, { Positioning } from 'ol/Overlay.js';
 import { Fill, Icon, Stroke, Style, Text, Circle as CircleStyle, RegularShape } from 'ol/style.js'
 import IFR_RTK from '../assets/icon/ic_track_g.svg'
 import IFR_ADSB from '../assets/icon/ic_track_w_5.svg'
 
-const designAircrft =  {
+
+const designAircrft = {
   border : 1,
   borderRadius: 5,
   acceptColor : '#26C97E', // green
@@ -29,8 +30,48 @@ const designAircrft =  {
   adsbColor : '#D9D9D9', // white
 }
 
-const usePlaybackStore = create((set, get) => {
-  return {
+interface Drone {
+  type: string;
+  callsign: string;
+  altitude: number;
+  gps_lat: number;
+  gps_lon: number;
+  [key: string]: any;  // 동적으로 추가되는 속성 처리
+}
+
+interface PlaybackStore {
+  playback_id: string | null;
+  originQueue: Queue<Drone[]>;
+  socket: WebSocket | null;
+  isWSMsgRequired: boolean;
+  wsDroneMarker: Record<string, any>;
+  wsDroneLabel: Record<string, any>;
+  wsLabelLine: Record<string, any>;
+  wsDroneVector: Record<string, any>;
+  applyFilter: boolean;
+  filteredAltitude: { min: number | null; max: number | null };
+  isShowVector: boolean;
+  labelOffset: number;
+  actions: {
+    connect: () => Promise<void>;
+    disconnect: () => Promise<void>;
+    loadPlayBack: (params: any) => Promise<any>;
+    pausePlayBack: (params: any) => Promise<any>;
+    stopPlayBack: (params: any) => Promise<any>;
+    setIsWSMsgRequired: (value: boolean) => void;
+    setWsDroneVector: (value: any) => void;
+    styleFunction: (feature: any) => void;
+    removeWsDroneData: (id: string) => void; 
+    pushWsDroneData: (eachDrone: any) => Promise<any>; 
+    createDroneLabel: (fid: string) =>  Promise<any>
+    updateDroneLabel: (fid: string) => void;
+    changeLabelColor:(id: string, color: string, lineColor: string, background: string, isWarning?: boolean) => void;
+    setOriginqueue:  (value: boolean) => void;
+  };
+}
+
+const usePlaybackStore = create<PlaybackStore>((set, get) => ({
+  
     playback_id: null,
     originQueue: new Queue(),
     socket: null,
@@ -47,22 +88,22 @@ const usePlaybackStore = create((set, get) => {
     actions: {
       connect: async () => {
         const uuid = UtilFunc.generateUUID();
+        const newSocket = new WebSocket(`ws://211.189.132.21:7080/ws2?token_id=${uuid}`)
         set({ playback_id: uuid });
-        set({ socket: new WebSocket(`ws://211.189.132.21:7080/ws2?token_id=${uuid}`) });
+        set({ socket: newSocket });
 
-        const { socket } = get();
-        socket.onerror = (error) => {
+        newSocket.onerror = (error) => {
           console.log("websocket connect error", error);
         }
-        socket.onopen = () => {
+        newSocket.onopen = () => {
           console.log("[socket] connected");
-          socket.send(`{"type":"**MONITOR**"}`);
+          newSocket.send(`{"type":"**MONITOR**"}`);
         }
-        socket.onclose = () => {
+        newSocket.onclose = () => {
           console.log("[socket] disconnected");
           window.location.reload();
         }
-        socket.onmessage = async (ms) => {
+        newSocket.onmessage = async (ms) => {
           const { isWSMsgRequired, originQueue, actions: {pushWsDroneData} } = get(); // get 사용
 
           try {
@@ -141,8 +182,8 @@ const usePlaybackStore = create((set, get) => {
         }
       },
       setIsWSMsgRequired: (value) => set({ isWSMsgRequired: value }),
-      setWsDroneVector: (value) => set({ setWsDroneVector: value}),
-      styleFunction: (feature, resolution) => {
+      setWsDroneVector: (value) => set({ wsDroneVector: value}),
+      styleFunction: (feature) => {
         const { wsDroneMarker } = get();
         const { mapRotation, nowZoom } = useMapStore.getState()
         let fplIdentifier = feature.get('id');
@@ -242,7 +283,7 @@ const usePlaybackStore = create((set, get) => {
         return styles[feature.getProperties().type]
       },
 
-      removeWsDroneData: (id) =>{
+      removeWsDroneData: (id: string) =>{
         set((state)=> {
           const { olMap, vectorSource, dragOverlay } = useMapStore.getState();
           const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector } = state;
@@ -271,7 +312,7 @@ const usePlaybackStore = create((set, get) => {
       },
       pushWsDroneData: async (payload) => {
         const { applyFilter, filteredAltitude, wsDroneMarker, wsDroneLabel, wsLabelLine, isShowVector, actions: {styleFunction, createDroneLabel, updateDroneLabel} }  = get();
-        const { olMap, vectorSource, getLayer } = useMapStore.getState();
+        const { olMap, vectorSource, getLayer, mapRotation } = useMapStore.getState();
         const { FPLList } = useFPLStore.getState();
         let flightPlanIdentifier = payload.result.flightPlanIdentifier;
         if(flightPlanIdentifier==undefined) flightPlanIdentifier = "test-identifier";
@@ -281,7 +322,8 @@ const usePlaybackStore = create((set, get) => {
     
         const newPoint = transform([payload.result.gps_lon, payload.result.gps_lat], 'EPSG:4326', 'EPSG:5179');
         const altitudeInRange = applyFilter
-            ? Number(payload.result.altitude) >= filteredAltitude.min && Number(payload.result.altitude) <= filteredAltitude.max
+            ? (filteredAltitude.min && Number(payload.result.altitude) >= filteredAltitude.min) && 
+              (filteredAltitude.max && Number(payload.result.altitude) <= filteredAltitude.max)
             : true; // applyFilter가 적용되지 않으면 모든 기체 표시
     
         //해당 항적에 관련된 FPL정보
@@ -297,7 +339,7 @@ const usePlaybackStore = create((set, get) => {
               id:flightPlanIdentifier,
               group:'drone',
               altitudeInRange: altitudeInRange
-            });
+            }) as any;
 
             newDroneMarker.setStyle(styleFunction)
             newDroneMarker.callsign = payload.result.callsign
@@ -327,13 +369,13 @@ const usePlaybackStore = create((set, get) => {
               }
             }));
             await createDroneLabel(flightPlanIdentifier);
-            if(isShowVector){
-              if(wsDroneVector[flightPlanIdentifier]){
-                //updateDroneVector(flightPlanIdentifier);
-              }else{
-                //createDroneVector(flightPlanIdentifier);
-              }
-            }
+            // if(isShowVector){
+            //   if(wsDroneVector[flightPlanIdentifier]){
+            //     //updateDroneVector(flightPlanIdentifier);
+            //   }else{
+            //     //createDroneVector(flightPlanIdentifier);
+            //   }
+            // }
     
             // //기체이상 경고 존재시 표출
             // for (let i=warningTemps.length-1; i>= 0; i--) {
@@ -481,7 +523,7 @@ const usePlaybackStore = create((set, get) => {
     
               //타겟설정된 드론은 실시간 헤딩각도에 따라 위치계산해줘야 함
               if(get().wsDroneMarker[flightPlanIdentifier].isTarget == true) {
-                let multifly = localStorage.getItem('multiply') || 1;
+                let multifly = Number(localStorage.getItem('multiply')) || 1;
     
                 // 라벨을 드론의 헤딩 방향으로 배치할 거리 (예: 80픽셀)
                 const distance = 100;
@@ -659,7 +701,7 @@ const usePlaybackStore = create((set, get) => {
         }
       },
       
-      createDroneLabel: async(flightPlanIdentifier) => {
+      createDroneLabel: async(flightPlanIdentifier: string) => {
         const { olMap, mapRotation, dragOverlay, vectorSource } = useMapStore.getState(); 
         const { wsDroneMarker, wsDroneLabel, wsLabelLine, labelOffset, actions: { changeLabelColor, styleFunction } } = get();  
         const { altitudeUnit, fontSize, fontWeight, fontStyle } = useSettingStore.getState(); 
@@ -710,11 +752,11 @@ const usePlaybackStore = create((set, get) => {
     
         const savedDataJSON = localStorage.getItem('labelPosition');
         let offset = [0,-labelOffset];
-        let positioning = 'bottom-center';
+        let positioning = 'bottom-center'; 
         if(savedDataJSON) {
           offset = JSON.parse(savedDataJSON).offset;
           positioning = JSON.parse(savedDataJSON).positioning
-          if(positioning == 'target') {
+          if(positioning === 'target') {
             const heading = updateDroneMarker.heading || 0;
             // 라벨을 드론의 헤딩 방향으로 배치할 거리 (예: 80픽셀)
             const distance = 120;
@@ -756,7 +798,7 @@ const usePlaybackStore = create((set, get) => {
         }
         const updateDroneLabel = new Overlay({
           position: adjustedCoord,
-          positioning: positioning,
+          positioning: positioning as Positioning,
           element: container,
           stopEvent: false,
           insertFirst: true,
@@ -808,21 +850,22 @@ const usePlaybackStore = create((set, get) => {
     
         vectorSource.addFeature(updateLabelLine);
     
-        container.addEventListener('contextmenu', (evt) =>{
-          evt.preventDefault();  // 기본 우클릭 메뉴 막기
+        // 우측 컨텍스트메뉴 우선 사용 X
+        // container.addEventListener('contextmenu', (evt) =>{
+        //   evt.preventDefault();  // 기본 우클릭 메뉴 막기
     
-          const existingMenu = document.querySelector('.context-menu');
-          if(!existingMenu) {
-            const pixel = [evt.clientX, evt.clientY];  // 마우스 클릭 위치에 따라 메뉴 표시
-            openContextMenu(pixel, updateDroneMarker);
-          }
-        });
+        //   const existingMenu = document.querySelector('.context-menu');
+        //   if(!existingMenu) {
+        //     const pixel = [evt.clientX, evt.clientY];  // 마우스 클릭 위치에 따라 메뉴 표시
+        //     openContextMenu(pixel, updateDroneMarker);
+        //   }
+        // });
 
         console.log('[createDroneLabel] 1: ', wsDroneMarker, wsDroneLabel, wsLabelLine);
         console.log('[createDroneLabel] 2: ', dragOverlay, olMap.getOverlays());
       },
     
-      updateDroneLabel: (flightPlanIdentifier) => {
+      updateDroneLabel: (flightPlanIdentifier: string) => {
         const { wsDroneMarker, wsDroneLabel } = get();
         const { altitudeUnit } = useSettingStore.getState(); 
         let altElement = wsDroneLabel[flightPlanIdentifier].getElement().querySelector('.altitude'); // 현재고도
@@ -861,7 +904,7 @@ const usePlaybackStore = create((set, get) => {
     
       },
 
-      changeLabelColor: (id, color, lineColor, background, isWarning) => {
+      changeLabelColor: (id: string, color: string, lineColor: string, background: string, isWarning?: boolean) => {
         const { wsLabelLine, wsDroneLabel } = get();
         let label = wsDroneLabel[id]?.getElement();
         if (label && !wsDroneLabel[id]?.get('die')) {
@@ -883,7 +926,7 @@ const usePlaybackStore = create((set, get) => {
         set({originQueue: new Queue()});
       }
     }
-  }
-})
+  
+}))
 
 export default usePlaybackStore;
