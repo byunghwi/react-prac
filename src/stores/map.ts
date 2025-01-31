@@ -93,7 +93,6 @@ interface MapStore {
   lines: any,
   myCorridor: any, // 내가 관리하는 회랑
   hideStyle: any,
-  dragOverlay: any,
   nowZoom: any,
   mapRotation: any,
   mapEvent: () => void,
@@ -263,7 +262,6 @@ const useMapStore = create<MapStore>((set, get) => ({
       fill: new Fill({ color: `rgba(0,0,0,0)` }),
     }),
   ],
-  dragOverlay: null,
   nowZoom: 0,
   mapRotation: 0,
   checkZoom: () => {
@@ -335,76 +333,6 @@ const useMapStore = create<MapStore>((set, get) => ({
         }
       });
     });
-
-    // [4] label 드래그 이벤트
-    get().dragOverlay.on('dragstart', function (e) {
-      let overlayGroup = e.overlay.getElement().classList[0];
-      if (overlayGroup === 'drone_label') {
-        const pbState = usePlaybackStore.getState();
-        const fid = e.overlay.getId();
-        const updateDroneLabel = pbState.wsDroneLabel[fid];
-        updateDroneLabel.isDragging = true;
-        updateDroneLabel.isTarget = false;
-
-        usePlaybackStore.setState((state)=> ({
-          wsDroneLabel: {
-            ...state.wsDroneLabel,
-            [fid] : updateDroneLabel
-          }
-        }))
-      }
-    })
-    get().dragOverlay.on('dragging', function (e) {
-      let overlayGroup = e.overlay.getElement().classList[0];
-      /* eslint-disable no-empty */
-      if (overlayGroup === 'drone_label') {
-        const pbState = usePlaybackStore.getState();
-        const fid = e.overlay.getId();
-        const drone = pbState.wsDroneMarker[fid].getGeometry().getCoordinates();
-        const updateLabelLine = pbState.wsLabelLine[fid];
-        updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
-
-        usePlaybackStore.setState((state)=> ({
-          wsLabelLine: {
-            ...state.wsLabelLine,
-            [fid] : updateLabelLine
-          }
-        }))
-
-      } else if (overlayGroup === 'ol-DST' || overlayGroup === 'ol-DST-last') {
-        let linePoint = e.overlay.get('measureLine').getGeometry().getCoordinates()[0];
-        e.overlay.get('measureLine').getGeometry().setCoordinates([linePoint, e.coordinate]);
-      }
-    });
-    get().dragOverlay.on('dragend', function (e) {
-      let overlayGroup = e.overlay.getElement().classList[0];
-      const fid = e.overlay.getId();
-      const pbState = usePlaybackStore.getState();
-      const updateDroneLabel = pbState.wsDroneLabel[fid];
-      const updateLabelLine = pbState.wsLabelLine[fid];
-      if (overlayGroup === 'drone_label') {
-        let drone = pbState.wsDroneMarker[fid].getGeometry().getCoordinates();
-        let sPixel = get().olMap.getPixelFromCoordinate(drone);
-        let ePixel = get().olMap.getPixelFromCoordinate(e.coordinate);
-        let x = ePixel[0] - sPixel[0];
-        let y = ePixel[1] - sPixel[1];
-        updateDroneLabel.set('x', x)
-        updateDroneLabel.set('y', y)
-        updateDroneLabel.isDragging = false;
-        updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
-
-        usePlaybackStore.setState((state)=> ({
-          wsDroneLabel: {
-            ...state.wsDroneLabel,
-            [fid] : updateDroneLabel
-          },
-          wsLabelLine: {
-            ...state.wsLabelLine,
-            [fid] : updateLabelLine
-          }
-        }))
-      };
-    });
   },
   initMap: async(map) => {
 		get().layerGroup = {}; // Layer 초기화
@@ -455,7 +383,7 @@ const useMapStore = create<MapStore>((set, get) => ({
     }
     get().layerGroup['default'] = get().vectorLayer;
 
-    get().olMap = new Map({
+    const newMap = new Map({
       layers : [get().vectorLayer],
       target: map,
       view: new View({
@@ -486,6 +414,12 @@ const useMapStore = create<MapStore>((set, get) => ({
       // logo:false
       controls: [],
     });
+
+    set(()=>{
+      newMap.on('moveend', get().checkZoom)
+      return ({ olMap: newMap})
+    });
+
     for (let i =0; i<get().tileNames_en.length;i++){
       get().layerGroup[get().tileNames_en[i]].setSource(new WMTS(Object.assign(
         {},
@@ -522,18 +456,9 @@ const useMapStore = create<MapStore>((set, get) => ({
 
     get().layerGroup[get().tileNames_en[0]].setVisible(true);
 
-    // dragOverlay 설정
-    set((state) => {
-      const overlay = new ol_interaction_DragOverlay({
-        overlays: [],
-        centerOnClick: false,});
-      state.olMap.addInteraction(overlay); // 상태 참조 후 즉시 작업 수행
-      return { dragOverlay: overlay }; // 상태 업데이트
-    });
-
-    get().olMap.on('moveend', get().checkZoom)
-
     get().mapEvent();
+
+    usePlaybackStore.getState().actions.dragOverlayEvent();   
   },
   transformCoords: (coords, sourceProj, targetProj) => {
     return coords.map(ring => ring.map(coord => transform(coord, sourceProj, targetProj)));

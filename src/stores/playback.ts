@@ -25,6 +25,7 @@ import {
 } from "ol/style.js";
 import IFR_RTK from "../assets/icon/ic_track_g.svg";
 import IFR_ADSB from "../assets/icon/ic_track_w_5.svg";
+import ol_interaction_DragOverlay from "ol-ext/interaction/DragOverlay"
 
 const designAircrft = {
   border: 1,
@@ -60,6 +61,7 @@ interface PlaybackStore {
   wsDroneLabel: Record<string, any>;
   wsLabelLine: Record<string, any>;
   wsDroneVector: Record<string, any>;
+  dragOverlay: ol_interaction_DragOverlay;    // dragOverlay 설정
   applyFilter: boolean;
   filteredAltitude: { min: number | null; max: number | null };
   isShowVector: boolean;
@@ -85,6 +87,7 @@ interface PlaybackStore {
       isWarning?: boolean
     ) => void;
     setOriginqueue: (value: boolean) => void;
+    dragOverlayEvent: () => void;
   };
 }
 
@@ -101,6 +104,7 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
   filteredAltitude: { min: null, max: null },
   isShowVector: false,
   labelOffset: 60,
+  dragOverlay: null,
 
   actions: {
     connect: async () => {
@@ -319,8 +323,8 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
 
     removeWsDroneData: (id: string) => {
       set((state) => {
-        const { olMap, vectorSource, dragOverlay } = useMapStore.getState();
-        const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector } =
+        const { olMap, vectorSource } = useMapStore.getState();
+        const { wsDroneMarker, wsLabelLine, wsDroneLabel, wsDroneVector, dragOverlay } =
           state;
 
         const newWsDroneMarker = { ...wsDroneMarker };
@@ -793,13 +797,14 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
     },
 
     createDroneLabel: async (flightPlanIdentifier: string) => {
-      const { olMap, mapRotation, dragOverlay, vectorSource } =
+      const { olMap, mapRotation, vectorSource } =
         useMapStore.getState();
       const {
         wsDroneMarker,
         wsDroneLabel,
         wsLabelLine,
         labelOffset,
+        dragOverlay,
         actions: { changeLabelColor, styleFunction },
       } = get();
       const { altitudeUnit, fontSize, fontWeight, fontStyle } =
@@ -941,6 +946,13 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
 
       updateOlMap.addOverlay(updateDroneLabel);
       updateDragOverlay.addOverlay(updateDroneLabel);
+
+      useMapStore.setState((state)=> ({
+        ...state,
+        olMap: updateOlMap,
+      }))
+
+      set({ dragOverlay: updateDragOverlay});
 
       updateDroneLabel.set("x", offset[0]);
       updateDroneLabel.set("y", offset[1]);
@@ -1089,6 +1101,103 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
     },
     setOriginqueue: () => {
       set({ originQueue: new Queue() });
+    },
+    dragOverlayEvent: () => {
+      set((state) => {
+        const overlay = new ol_interaction_DragOverlay({
+          overlays: [],
+          centerOnClick: false,
+        });
+    
+        //외부 map.ts의 olMap 상태 업데이트
+        useMapStore.setState((mapState) => {
+          mapState.olMap.addInteraction(overlay);
+          return { olMap: mapState.olMap };
+        });
+    
+        // dragOverlay 상태 업데이트
+        return { dragOverlay: overlay };
+      });
+
+      // [4] label 드래그 이벤트
+      get().dragOverlay.on("dragstart", function (e) {
+        let overlayGroup = e.overlay.getElement().classList[0];
+        if (overlayGroup === "drone_label") {
+          const { wsDroneLabel } = get();
+          const fid = e.overlay.getId();
+          const updateDroneLabel = wsDroneLabel[fid];
+          updateDroneLabel.isDragging = true;
+          updateDroneLabel.isTarget = false;
+
+          set((state) => ({
+            wsDroneLabel: {
+              ...state.wsDroneLabel,
+              [fid]: updateDroneLabel,
+            },
+          }));
+        }
+      });
+      get().dragOverlay.on("dragging", function (e) {
+        let overlayGroup = e.overlay.getElement().classList[0];
+        /* eslint-disable no-empty */
+        if (overlayGroup === "drone_label") {
+          const { wsDroneMarker, wsLabelLine } = get();
+          const fid = e.overlay.getId();
+          const drone = wsDroneMarker[fid]
+            .getGeometry()
+            .getCoordinates();
+          const updateLabelLine = wsLabelLine[fid];
+          updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
+
+          set((state) => ({
+            wsLabelLine: {
+              ...state.wsLabelLine,
+              [fid]: updateLabelLine,
+            },
+          }));
+        } else if (
+          overlayGroup === "ol-DST" ||
+          overlayGroup === "ol-DST-last"
+        ) {
+          let linePoint = e.overlay
+            .get("measureLine")
+            .getGeometry()
+            .getCoordinates()[0];
+          e.overlay
+            .get("measureLine")
+            .getGeometry()
+            .setCoordinates([linePoint, e.coordinate]);
+        }
+      });
+      get().dragOverlay.on("dragend", function (e) {
+        let overlayGroup = e.overlay.getElement().classList[0];
+        const fid = e.overlay.getId();
+        const { wsDroneMarker, wsDroneLabel, wsLabelLine} = get();
+        const updateDroneLabel = wsDroneLabel[fid];
+        const updateLabelLine = wsLabelLine[fid];
+        if (overlayGroup === "drone_label") {
+          let drone = wsDroneMarker[fid].getGeometry().getCoordinates();
+          let sPixel = useMapStore.getState().olMap.getPixelFromCoordinate(drone);
+          let ePixel = useMapStore.getState().olMap.getPixelFromCoordinate(e.coordinate);
+          let x = ePixel[0] - sPixel[0];
+          let y = ePixel[1] - sPixel[1];
+          updateDroneLabel.set("x", x);
+          updateDroneLabel.set("y", y);
+          updateDroneLabel.isDragging = false;
+          updateLabelLine.getGeometry().setCoordinates([drone, e.coordinate]);
+
+          set((state) => ({
+            wsDroneLabel: {
+              ...state.wsDroneLabel,
+              [fid]: updateDroneLabel,
+            },
+            wsLabelLine: {
+              ...state.wsLabelLine,
+              [fid]: updateLabelLine,
+            },
+          }));
+        }
+      });
     },
   },
 }));
