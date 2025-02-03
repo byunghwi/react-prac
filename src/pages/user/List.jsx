@@ -27,7 +27,7 @@ export default function List() {
   const getUserList = async() => {
     try {
       let params = {}
-      params.pageNo = pageNo;
+      params.pageNo = useSettingStore.getState().pageNo;
       params.numOfRows = Constants.NumOfRows;
       params.srchType = SrchType;
       params.srchValue = SrchValue;

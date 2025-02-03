@@ -28,7 +28,7 @@ export default function List() {
   const getVertiportList = async() => {
     try {
       let params = {dataType: "JSON"}
-      params.pageNo = pageNo;
+      params.pageNo = useSettingStore.getState().pageNo;
       params.numOfRows = Constants.NumOfRows;
       params.srchType = SrchType;
       params.srchValue = SrchValue;

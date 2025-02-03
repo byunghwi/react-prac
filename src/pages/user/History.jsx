@@ -41,7 +41,7 @@ export default function UserHistory() {
   const getUserLogList = async(startDate, endDate) => {
     try {
       let params = {}
-      params.pageNo = pageNo;
+      params.pageNo = useSettingStore.getState().pageNo;
       params.numOfRows = Constants.NumOfRows;
       if(startDate) params.startDate = startDate;
       if(endDate) params.endDate = endDate;

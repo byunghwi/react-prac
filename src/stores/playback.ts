@@ -110,7 +110,7 @@ const usePlaybackStore = create<PlaybackStore>((set, get) => ({
     connect: async () => {
       const uuid = UtilFunc.generateUUID();
       const newSocket = new WebSocket(
-        `ws://211.189.132.21:7080/ws2?token_id=${uuid}`
+        `ws://${window.location.host}/ws2?token_id=${uuid}`
       );
       set({ playback_id: uuid });
       set({ socket: newSocket });

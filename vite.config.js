@@ -34,11 +34,13 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://211.189.132.21:7080',
+        //target: 'http://211.189.132.21:7080',
+        target: 'http://localhost:7080',
         changeOrigin: true,
       },
       '/ws2': {
-        target: 'ws://211.189.132.21:7080',
+        //target: 'ws://211.189.132.21:7080',
+        target: 'ws://localhost:7080',
         changeOrigin: true,
         ws: true,
       },

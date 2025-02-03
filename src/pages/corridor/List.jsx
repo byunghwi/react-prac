@@ -29,7 +29,7 @@ export default function List() {
     try {
       let params = {dataType: "JSON"}
       if(isPaging){
-        params.pageNo = pageNo;
+        params.pageNo = useSettingStore.getState().pageNo;
         params.numOfRows = Constants.NumOfRows;
       }
       params.srchType = SrchType;
@@ -98,7 +98,7 @@ export default function List() {
             onPaginatedLoad={paginatedLoad}
           />
         </div>
-        <div className="wrap-reg"><button onClick={()=>register}>등록</button></div>
+        <div className="wrap-reg"><button onClick={register}>등록</button></div>
       </div>
     </div>
   )

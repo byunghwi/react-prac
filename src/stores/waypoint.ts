@@ -12,6 +12,7 @@ interface WaypointStore {
   SrchValue: any,
   setSrchValue: (val?:string) => void,
   isOpenWaypointPop: boolean,
+  setisOpenWaypointPop: (val:boolean) => void,
   waypointList: any,
   allWaypoints: (isPaging?: boolean) => Promise<void>;
   modifyWaypoint: (data?: any) => Promise<void>;
@@ -27,6 +28,7 @@ const useWaypointStore = create<WaypointStore>((set, get) => ({
   SrchValue: '',
   setSrchValue: (val?:string) => set({ SrchValue: val}),
   isOpenWaypointPop: (false),
+  setisOpenWaypointPop: (val:boolean) => set({ isOpenWaypointPop: val}),
   waypointList: ([]),
   allWaypoints: async(isPaging) => {
     try {
